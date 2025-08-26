@@ -1,7 +1,7 @@
 Chewbite Deep Fusion Experimentation
 ====================================
 
-This repository contains all experiments, settings and data processing logic in order to explore different approaches and architectures for a fusion model, capable of detecting and classifying jaw movements from grazing cattle based on acoustic and movement signals.
+The repository aims to develop a fusion model capable of detecting and classifying jaw movements of grazing cattle based on sound. (The portions related to IMU motion in the code are unnecessary.)
 
 Installation
 ------------
@@ -35,8 +35,8 @@ The use of an external tool called YAER (Yet Another Experiment Runner) allows y
 In order to do so, you must move into project directory "src/chewbite_fusion" and then run: yaer run -e [experiment_name] -d
 
 For example:
-- Running one experiment: yaer run -e bloch2023_v6 -d
-- Running three different experiments: yaer run -e rf_v4 -e rf_v5 -e rf_v6 -d
+- Running one experiment: yaer run -e deep-sound -d
+- Running three different experiments: yaer run -e deep-sound -d
 - Running all experiments matching a given regular expression: yaer run -re 'deep_fusion' -d
 
 Note: Some experiments run only on GPU devices.
