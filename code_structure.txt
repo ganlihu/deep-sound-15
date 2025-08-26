@@ -1,0 +1,4342 @@
+.
+./.ipynb_checkpoints
+./src
+./src/chewbite_fusion
+./src/chewbite_fusion/models
+./src/chewbite_fusion/models/.ipynb_checkpoints
+./src/chewbite_fusion/data
+./src/chewbite_fusion/data/.ipynb_checkpoints
+./src/chewbite_fusion/experiments
+./src/chewbite_fusion/experiments/.ipynb_checkpoints
+./src/chewbite_fusion/features
+./src/chewbite_fusion/features/.ipynb_checkpoints
+./.git
+./.git/hooks
+./.git/info
+./.git/branches
+./.git/logs
+./.git/logs/refs
+./.git/logs/refs/remotes
+./.git/logs/refs/remotes/origin
+./.git/logs/refs/heads
+./.git/objects
+./.git/objects/08
+./.git/objects/e8
+./.git/objects/2d
+./.git/objects/71
+./.git/objects/29
+./.git/objects/21
+./.git/objects/a3
+./.git/objects/70
+./.git/objects/ed
+./.git/objects/9b
+./.git/objects/f8
+./.git/objects/17
+./.git/objects/67
+./.git/objects/fe
+./.git/objects/63
+./.git/objects/2b
+./.git/objects/11
+./.git/objects/5c
+./.git/objects/7c
+./.git/objects/97
+./.git/objects/e3
+./.git/objects/4d
+./.git/objects/8f
+./.git/objects/e6
+./.git/objects/74
+./.git/objects/e0
+./.git/objects/3f
+./.git/objects/f3
+./.git/objects/c3
+./.git/objects/89
+./.git/objects/43
+./.git/objects/62
+./.git/objects/f9
+./.git/objects/cf
+./.git/objects/da
+./.git/objects/d8
+./.git/objects/a7
+./.git/objects/d2
+./.git/objects/80
+./.git/objects/6b
+./.git/objects/c1
+./.git/objects/06
+./.git/objects/87
+./.git/objects/dd
+./.git/objects/49
+./.git/objects/4c
+./.git/objects/91
+./.git/objects/02
+./.git/objects/82
+./.git/objects/51
+./.git/objects/01
+./.git/objects/c5
+./.git/objects/86
+./.git/objects/be
+./.git/objects/b6
+./.git/objects/2a
+./.git/objects/38
+./.git/objects/b0
+./.git/objects/66
+./.git/objects/19
+./.git/objects/b4
+./.git/objects/f0
+./.git/objects/e5
+./.git/objects/83
+./.git/objects/ea
+./.git/objects/0b
+./.git/objects/info
+./.git/objects/pack
+./.git/objects/4b
+./.git/objects/ba
+./.git/objects/26
+./.git/objects/ab
+./.git/objects/d3
+./.git/objects/c2
+./.git/objects/a4
+./.git/objects/6c
+./.git/objects/8c
+./.git/objects/3e
+./.git/objects/18
+./.git/objects/bf
+./.git/objects/88
+./.git/objects/04
+./.git/objects/7d
+./.git/objects/28
+./.git/objects/7b
+./.git/objects/fa
+./.git/objects/df
+./.git/objects/8d
+./.git/objects/b5
+./.git/objects/99
+./.git/objects/20
+./.git/objects/d5
+./.git/objects/bd
+./.git/objects/1b
+./.git/objects/33
+./.git/objects/c0
+./.git/objects/ca
+./.git/objects/54
+./.git/objects/5e
+./.git/objects/85
+./.git/objects/16
+./.git/objects/77
+./.git/objects/0e
+./.git/objects/d0
+./.git/objects/0f
+./.git/objects/1f
+./.git/objects/94
+./.git/objects/0c
+./.git/objects/73
+./.git/objects/95
+./.git/objects/b1
+./.git/objects/64
+./.git/objects/12
+./.git/objects/57
+./.git/objects/84
+./.git/objects/03
+./.git/objects/52
+./.git/objects/d9
+./.git/objects/35
+./.git/objects/a8
+./.git/refs
+./.git/refs/remotes
+./.git/refs/remotes/origin
+./.git/refs/heads
+./.git/refs/tags
+./data
+./data/external
+./data/processed
+./data/raw
+./data/raw/audios
+./data/raw/labels
+./data/interim
+\nFile: ./.ipynb_checkpoints/setup-checkpoint.py
+from setuptools import find_packages, setup
+
+setup(
+    name='chewbite_fusion',
+    packages=['chewbite_fusion'],
+    package_dir={'': 'src'},
+    version='0.1.0',
+    description='Audio and movement events detection.',
+    author='sinc(i)',
+    license='MIT',
+    install_requires=[
+        'pandas==1.5.3',
+        'plotly==5.14.0',
+        'scipy==1.10.1',
+        'notebook==6.5.3',
+        'scikit-learn==1.2.2',
+        'librosa==0.10.0',
+        'more_itertools==9.1.0',
+        'yaer @ git+https://github.com/arielrossanigo/yaer.git#egg=yaer',
+        'tensorflow==2.12.0',
+        'sed_eval==0.2.1',
+        'xgboost==1.7.5',
+        'seaborn==0.12.2'
+    ]
+)
+\nFile: ./src/chewbite_fusion/__init__.py
+\nFile: ./src/chewbite_fusion/models/settings.py
+models_path = ''\nFile: ./src/chewbite_fusion/models/.ipynb_checkpoints/settings-checkpoint.py
+models_path = ''\nFile: ./src/chewbite_fusion/models/.ipynb_checkpoints/deep_sound-checkpoint.py
+import os
+import copy
+
+import numpy as np
+
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.optimizers import Adagrad
+from tensorflow.keras import activations
+
+
+class DeepSoundBaseRNN:
+    ''' Create a RNN. '''
+    def __init__(self,
+                 batch_size=5,
+                 n_epochs=1400,
+                 training_reshape=False,
+                 set_sample_weights=True,
+                 feature_scaling=True):
+        self.classes_ = None
+        self.padding_class = None
+
+        self.batch_size = batch_size
+        self.n_epochs = n_epochs
+        self.data_format = 'channels_last'
+        self.ghost_dim = 2
+        self.padding = "valid"
+        self.training_shape = training_reshape
+        self.set_sample_weights = set_sample_weights
+        self.feature_scaling = feature_scaling
+
+    def fit(self, X, y):
+        ''' Train network based on given data. '''
+        self.classes_ = list(set(np.concatenate(y)))
+        self.padding_class = len(self.classes_)
+
+        X_pad = []
+
+        for i in X:
+            X_pad.append(
+                keras.preprocessing.sequence.pad_sequences(i,
+                                                           padding='post',
+                                                           value=-100.0,
+                                                           dtype=float))
+
+        y = keras.preprocessing.sequence.pad_sequences(
+            y,
+            padding='post',
+            value=self.padding_class,
+            dtype=object)
+
+        X = np.asarray(X_pad).astype('float32')
+        y = np.asarray(y).astype('float32')
+
+        model_callbacks = [
+            tf.keras.callbacks.EarlyStopping(patience=50)
+        ]
+
+        # Get sample weights if needed.
+        sample_weights = None
+        if self.set_sample_weights:
+            sample_weights = self._get_samples_weights(y)
+
+        self.model.fit(x=X,
+                       y=y,
+                       epochs=self.n_epochs,
+                       verbose=1,
+                       batch_size=self.batch_size,
+                       validation_split=0.2,
+                       shuffle=True,
+                       sample_weight=sample_weights,
+                       callbacks=model_callbacks)
+
+    def predict(self, X):
+        X_pad = []
+        for i in X:
+            X_pad.append(
+                keras.preprocessing.sequence.pad_sequences(i,
+                                                           padding='post',
+                                                           value=-100.0,
+                                                           dtype=float))
+
+        X = np.asarray(X_pad).astype('float32')
+
+        X = X[0]
+        if self.feature_scaling:
+            X = (X + 1.0) * 100
+
+        y_pred = self.model.predict(X).argmax(axis=-1)
+
+        return y_pred
+
+    def predict_proba(self, X):
+        X_pad = []
+        for i in X:
+            X_pad.append(
+                keras.preprocessing.sequence.pad_sequences(i,
+                                                           padding='post',
+                                                           value=-100.0,
+                                                           dtype=float))
+
+        X = np.asarray(X_pad).astype('float32')
+
+        X = X[0]
+
+        y_pred = self.model.predict(X)
+
+        return y_pred
+
+    def _get_samples_weights(self, y):
+        # Get items counts.
+        _, _, counts = np.unique(np.ravel(y),
+                                 return_counts=True,
+                                 return_index=True,
+                                 axis=0)
+
+        # Get max without last element (padding class).
+        class_weight = counts[:-1].max() / counts
+
+        # Set padding class weight to zero.
+        class_weight[self.padding_class] = 0.0
+        class_weight = {cls_num: weight for cls_num, weight in enumerate(class_weight)}
+        sample_weight = np.zeros_like(y, dtype=float)
+
+        print(class_weight)
+
+        # Assign weight to every sample depending on class.
+        for class_num, weight in class_weight.items():
+            sample_weight[y == class_num] = weight
+
+        return sample_weight
+
+    def clear_params(self):
+        self.model.set_weights(copy.deepcopy(self.weights_))
+
+
+class DeepSound(DeepSoundBaseRNN):
+    def __init__(self,
+                 batch_size=5,
+                 input_size=4000,
+                 output_size=3,
+                 n_epochs=1400,
+                 training_reshape=False,
+                 set_sample_weights=True,
+                 feature_scaling=True):
+        ''' Create network instance of DeepSound arquitecture.
+        '''
+        super().__init__(batch_size,
+                         n_epochs,
+                         training_reshape,
+                         set_sample_weights,
+                         feature_scaling=feature_scaling)
+
+        layers_config = [(32, 18, 3, activations.relu),
+                         (32, 9, 1, activations.relu),
+                         (128, 3, 1, activations.relu)]
+
+        # Model definition
+        cnn = Sequential()
+        cnn.add(layers.Rescaling())
+
+        for ix_l, layer in enumerate(layers_config):
+            for i in range(2):
+                cnn.add(layers.Conv1D(layer[0],
+                                      kernel_size=layer[1],
+                                      strides=layer[2],
+                                      activation=layer[3],
+                                      padding=self.padding,
+                                      data_format=self.data_format))
+            if ix_l < (len(layers_config) - 1):
+                cnn.add(layers.Dropout(rate=0.2))
+
+        cnn.add(layers.MaxPooling1D(4))
+        cnn.add(layers.Flatten())
+        cnn.add(layers.Dropout(rate=0.2))
+
+        ffn = Sequential()
+
+        ffn.add(layers.Dense(256, activation=activations.relu))
+        ffn.add(layers.Dropout(rate=0.2))
+        ffn.add(layers.Dense(128, activation=activations.relu))
+        ffn.add(layers.Dropout(rate=0.2))
+        ffn.add(layers.Dense(output_size, activation=activations.softmax))
+
+        model = Sequential([layers.InputLayer(input_shape=(None, input_size, 1), name='input1'),
+                            layers.TimeDistributed(cnn),
+                            layers.Bidirectional(layers.GRU(128, activation="tanh",
+                                                            return_sequences=True, dropout=0.2)),
+                            layers.TimeDistributed(ffn)])
+
+        model.compile(optimizer=Adagrad(),
+                      loss='sparse_categorical_crossentropy',
+                      weighted_metrics=['accuracy'])
+
+        self.model = model
+        self.weights_ = copy.deepcopy(model.get_weights())
+\nFile: ./src/chewbite_fusion/models/__init__.py
+\nFile: ./src/chewbite_fusion/models/deep_sound.py
+import os
+import copy
+
+import numpy as np
+
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.optimizers import Adagrad
+from tensorflow.keras import activations
+
+
+class DeepSoundBaseRNN:
+    ''' Create a RNN. '''
+    def __init__(self,
+                 batch_size=5,
+                 n_epochs=1400,
+                 training_reshape=False,
+                 set_sample_weights=True,
+                 feature_scaling=True):
+        self.classes_ = None
+        self.padding_class = None
+
+        self.batch_size = batch_size
+        self.n_epochs = n_epochs
+        self.data_format = 'channels_last'
+        self.ghost_dim = 2
+        self.padding = "valid"
+        self.training_shape = training_reshape
+        self.set_sample_weights = set_sample_weights
+        self.feature_scaling = feature_scaling
+
+    def fit(self, X, y):
+        ''' Train network based on given data. '''
+        self.classes_ = list(set(np.concatenate(y)))
+        self.padding_class = len(self.classes_)
+
+        X_pad = []
+
+        for i in X:
+            X_pad.append(
+                keras.preprocessing.sequence.pad_sequences(i,
+                                                           padding='post',
+                                                           value=-100.0,
+                                                           dtype=float))
+
+        y = keras.preprocessing.sequence.pad_sequences(
+            y,
+            padding='post',
+            value=self.padding_class,
+            dtype=object)
+
+        X = np.asarray(X_pad).astype('float32')
+        y = np.asarray(y).astype('float32')
+
+        model_callbacks = [
+            tf.keras.callbacks.EarlyStopping(patience=50)
+        ]
+
+        # Get sample weights if needed.
+        sample_weights = None
+        if self.set_sample_weights:
+            sample_weights = self._get_samples_weights(y)
+
+        self.model.fit(x=X,
+                       y=y,
+                       epochs=self.n_epochs,
+                       verbose=1,
+                       batch_size=self.batch_size,
+                       validation_split=0.2,
+                       shuffle=True,
+                       sample_weight=sample_weights,
+                       callbacks=model_callbacks)
+
+    def predict(self, X):
+        X_pad = []
+        for i in X:
+            X_pad.append(
+                keras.preprocessing.sequence.pad_sequences(i,
+                                                           padding='post',
+                                                           value=-100.0,
+                                                           dtype=float))
+
+        X = np.asarray(X_pad).astype('float32')
+
+        X = X[0]
+        if self.feature_scaling:
+            X = (X + 1.0) * 100
+
+        y_pred = self.model.predict(X).argmax(axis=-1)
+
+        return y_pred
+
+    def predict_proba(self, X):
+        X_pad = []
+        for i in X:
+            X_pad.append(
+                keras.preprocessing.sequence.pad_sequences(i,
+                                                           padding='post',
+                                                           value=-100.0,
+                                                           dtype=float))
+
+        X = np.asarray(X_pad).astype('float32')
+
+        X = X[0]
+
+        y_pred = self.model.predict(X)
+
+        return y_pred
+
+    def _get_samples_weights(self, y):
+        # Get items counts.
+        _, _, counts = np.unique(np.ravel(y),
+                                 return_counts=True,
+                                 return_index=True,
+                                 axis=0)
+
+        # Get max without last element (padding class).
+        class_weight = counts[:-1].max() / counts
+
+        # Set padding class weight to zero.
+        class_weight[self.padding_class] = 0.0
+        class_weight = {cls_num: weight for cls_num, weight in enumerate(class_weight)}
+        sample_weight = np.zeros_like(y, dtype=float)
+
+        print(class_weight)
+
+        # Assign weight to every sample depending on class.
+        for class_num, weight in class_weight.items():
+            sample_weight[y == class_num] = weight
+
+        return sample_weight
+
+    def clear_params(self):
+        self.model.set_weights(copy.deepcopy(self.weights_))
+
+
+class DeepSound(DeepSoundBaseRNN):
+    def __init__(self,
+                 batch_size=5,
+                 input_size=4000,
+                 output_size=3,
+                 n_epochs=1400,
+                 training_reshape=False,
+                 set_sample_weights=True,
+                 feature_scaling=True):
+        ''' Create network instance of DeepSound arquitecture.
+        '''
+        super().__init__(batch_size,
+                         n_epochs,
+                         training_reshape,
+                         set_sample_weights,
+                         feature_scaling=feature_scaling)
+
+        layers_config = [(32, 18, 3, activations.relu),
+                         (32, 9, 1, activations.relu),
+                         (128, 3, 1, activations.relu)]
+
+        # Model definition
+        cnn = Sequential()
+        cnn.add(layers.Rescaling())
+
+        for ix_l, layer in enumerate(layers_config):
+            for i in range(2):
+                cnn.add(layers.Conv1D(layer[0],
+                                      kernel_size=layer[1],
+                                      strides=layer[2],
+                                      activation=layer[3],
+                                      padding=self.padding,
+                                      data_format=self.data_format))
+            if ix_l < (len(layers_config) - 1):
+                cnn.add(layers.Dropout(rate=0.2))
+
+        cnn.add(layers.MaxPooling1D(4))
+        cnn.add(layers.Flatten())
+        cnn.add(layers.Dropout(rate=0.2))
+
+        ffn = Sequential()
+
+        ffn.add(layers.Dense(256, activation=activations.relu))
+        ffn.add(layers.Dropout(rate=0.2))
+        ffn.add(layers.Dense(128, activation=activations.relu))
+        ffn.add(layers.Dropout(rate=0.2))
+        ffn.add(layers.Dense(output_size, activation=activations.softmax))
+
+        model = Sequential([layers.InputLayer(input_shape=(None, input_size, 1), name='input1'),
+                            layers.TimeDistributed(cnn),
+                            layers.Bidirectional(layers.GRU(128, activation="tanh",
+                                                            return_sequences=True, dropout=0.2)),
+                            layers.TimeDistributed(ffn)])
+
+        model.compile(optimizer=Adagrad(),
+                      loss='sparse_categorical_crossentropy',
+                      weighted_metrics=['accuracy'])
+
+        self.model = model
+        self.weights_ = copy.deepcopy(model.get_weights())
+\nFile: ./src/chewbite_fusion/data/settings.py
+DATA_SOURCES_PATH = ''
+CACHE_DIR = ''
+\nFile: ./src/chewbite_fusion/data/.ipynb_checkpoints/make_dataset-checkpoint.py
+# -*- coding: utf-8 -*-
+import logging
+import os
+
+import numpy as np
+import pandas as pd
+from scipy import signal
+import librosa
+import more_itertools
+
+from chewbite_fusion.data.cache_manager import DatasetCache
+from chewbite_fusion.data import utils_data_sources as utils
+
+
+logger = logging.getLogger(__name__)
+
+
+def main(data_source_names=['zavalla2022'],
+         audio_sampling_frequency=8000,
+         movement_sampling_frequency=100,
+         window_width=0.5,
+         window_overlap=0.5,
+         label_overlapping_threshold=0.5,
+         filter_noises=True,
+         include_movement_magnitudes=False,
+         no_event_class_name='no-event',
+         filters=None,
+         invalidate_cache=False):
+    """ Run data processing scripts to turn raw data from (../raw) into
+        cleaned data ready to be analyzed (saved in ../processed).
+
+        Parameters
+        ----------
+        data_source_names : list of str
+            List of all data source names to be included in the final dataset.
+            At this moment there is one option valid: 'zavalla2022'.
+        audio_sampling_frequency : int or float
+            Sampling frequency of audio source files.
+        movement_sampling_frequency : int or float
+            Sampling frequency of IMU source files.
+        window_width : float
+            Size of window in seconds used to split signals.
+        window_overlap : float
+            Overlapping proportion between to consecutive windows (0.00 - 1.00).
+        label_overlapping_threshold : float
+            Minimun threshold to assign a label to frame w.r.t. window width (0.00 - 1.00).
+        filter_noises : bool
+            Define if parts of original signals which include noises are included.
+        include_movement_magnitudes : bool
+            Define if magnitudes of IMU data are calculated.
+        no_event_class_name : str
+            Class name to represent the absense of an event of interest.
+        filters : list of tuples.
+            List of filters, channels and a flag to indicate if applied to movement signals.
+            For example, [(signal.butter(10, 15, 'hp'), [0, 1, 2], True)]
+                apply a 15th order high-pass Butterworth filter to acceleromter x, y and z axis.
+        invalidate_cache : bool
+            Force to update cache.
+
+        Returns
+        -------
+        X : Dictionary-like object, with data sources as keys.
+            Each value represent segments of data, and include all extracted windows.
+            Example:
+            X = {
+                'zavalla2022': {
+                    'segment_1_cel_1': [
+                        [
+                                                    # window 1
+                            [0.83, 0.55, 0.21],     # audio mono
+                            [0.0, 0.1, 0.17],       # acc x
+                            [0.0, 0.52, 0.49],      # acc y
+                            [0.0, -0.07, -0.14],    # acc z
+                            [0.0, 0.1, 0.17],       # gyr x
+                            [0.0, 0.52, 0.49],      # gyr y
+                            [0.0, -0.07, -0.14],    # gyr z
+                            [0.0, 0.1, 0.17],       # mag x
+                            [0.0, 0.52, 0.49],      # mag y
+                            [0.0, -0.07, -0.14],    # mag z
+                                                    # OPTIONAL
+                            [0.2, -0.08, 1.15],     # acc magnitude
+                            [0.0, 0.0, 0.1],        # gyr magnitude
+                            [1.0, 0.97, 0.89],      # mag magnitude
+                        ],
+                        [
+                            ...
+                        ]
+                    ]
+                }
+            }
+        y : Dictionary-like object, with data sources as keys.
+            Each value represent segments of data, and include labels for each window.
+            Example:
+            y = {
+                'zavalla2022': {
+                    'segment_1_cel_1': [
+                        'no-event',                 # window 1
+                        'no-event',                 # window 2
+                        'chew',                     # window 3
+                        ...
+                    ],
+                    ...
+                }
+            }
+    """
+    logger = logging.getLogger(__name__)
+
+    cache = DatasetCache()
+
+    # Try to retrieve elements from cache.
+    cache_item = cache.load(
+        data_source_names=data_source_names,
+        audio_sampling_frequency=audio_sampling_frequency,
+        movement_sampling_frequency=movement_sampling_frequency,
+        window_width=window_width,
+        window_overlap=window_overlap,
+        label_overlapping_threshold=label_overlapping_threshold,
+        filter_noises=filter_noises,
+        include_movement_magnitudes=include_movement_magnitudes,
+        no_event_class_name=no_event_class_name,
+        filters=filters)
+
+    if cache_item and not invalidate_cache:
+        logger.info('*** Retrieving dataset from cache ! ***')
+        (X, y) = cache_item
+
+        return X, y
+
+    logger.info('*** Creating dataset from scratch ! ***')
+    available_datasets = utils.list_datasets()
+
+    for data_source_name in data_source_names:
+        assert data_source_name in available_datasets, \
+            f'Provided data source name {data_source_name} not available.'
+
+    assert (audio_sampling_frequency * window_width) % 5 == 0, \
+        '''Incompatible audio sampling frequency and window width
+           (Validation condition: audio_sampling_frequency * window_width) % 5).'''
+
+    assert (audio_sampling_frequency * window_width * (1 - window_overlap)) % 5 == 0, \
+        '''Incompatible audio sampling frequency and window overlap
+           (Validation condition:
+           audio_sampling_frequency * window_width * (1 - window_overlap)) % 5).'''
+
+    assert (movement_sampling_frequency * window_width) % 5 == 0, \
+        '''Incompatible movement sampling frequency and window width
+           (Validation condition: movement_sampling_frequency * window_width) % 5).'''
+
+    assert (movement_sampling_frequency * window_width * (1 - window_overlap)) % 5 == 0, \
+        '''Incompatible movement sampling frequency and window overlap
+           (Validation condition:
+           movement_sampling_frequency * window_width * (1 - window_overlap)) % 5).'''
+
+    X = {}
+    y = {}
+
+    for dataset in data_source_names:
+        segment_files = utils.get_files_in_dataset(available_datasets[dataset])
+
+        X_dataset_segments = {}
+        y_dataset_segments = {}
+        for segment in segment_files:
+            segment_name = os.path.basename(segment[0]).split('.')[0]
+            logger.info("> Processing segment: %s", segment_name)
+
+            # Read audio file.
+            audio_signal, sf = librosa.load(segment[0])
+            audio_signal = librosa.resample(y=audio_signal,
+                                            orig_sr=sf,
+                                            target_sr=audio_sampling_frequency)
+
+            dataset_has_movement_data = len(segment) > 2
+
+            # Read IMU files.
+            imu_data = []
+
+            if dataset_has_movement_data:
+                for i in range(1, 10):
+                    signal_axis_values = pd.read_csv(segment[i],
+                                                    names=['axis_value']).axis_value.values
+                    data_sampling_frequency = available_datasets[dataset].imu_sampling_frequency
+                    if data_sampling_frequency != movement_sampling_frequency:
+                        sampling_relation = data_sampling_frequency / movement_sampling_frequency
+
+                        signal_decimated = signal.decimate(signal_axis_values,
+                                                        int(sampling_relation))
+                        imu_data.append(signal_decimated)
+                    else:
+                        imu_data.append(signal_axis_values)
+
+                if include_movement_magnitudes:
+                    accelerometer_magnitude = \
+                        np.sqrt(imu_data[0] ** 2 + imu_data[1] ** 2 + imu_data[2] ** 2)
+                    imu_data.append(accelerometer_magnitude)
+                    gyroscope_magnitude = \
+                        np.sqrt(imu_data[3] ** 2 + imu_data[4] ** 2 + imu_data[5] ** 2)
+                    imu_data.append(gyroscope_magnitude)
+                    magnetometer_magnitude = \
+                        np.sqrt(imu_data[6] ** 2 + imu_data[7] ** 2 + imu_data[8] ** 2)
+                    imu_data.append(magnetometer_magnitude)
+
+            if filters:
+                for filter in filters:
+                    for channel in filter[1]:
+                        filter_method = filter[0]
+                        if filter[2] and dataset_has_movement_data:
+                            imu_data[channel] = filter_method(imu_data[channel])
+                        else:
+                            audio_signal = filter_method(audio_signal)
+
+            # Read labels file.
+            df_segment_labels = pd.read_csv(
+                segment[-1],
+                sep='\t',
+                names=["start", "end", "jm_event"])
+
+            general_mask = df_segment_labels.jm_event
+            df_segment_labels.loc[general_mask == 'u', 'jm_event'] = 'unknown'
+            df_segment_labels.loc[general_mask == 'b', 'jm_event'] = 'bite'
+            df_segment_labels.loc[general_mask == 'c', 'jm_event'] = 'grazing-chew'
+            df_segment_labels.loc[general_mask == 'r', 'jm_event'] = 'rumination-chew'
+            df_segment_labels.loc[general_mask == 'x', 'jm_event'] = 'chewbite'
+
+            # Get windows from signals.
+            audio_windows = get_windows_from_audio_signal(
+                audio_signal,
+                sampling_frequency=audio_sampling_frequency,
+                window_width=window_width,
+                window_overlap=window_overlap)
+
+            imu_windows = []
+            if dataset_has_movement_data:
+                imu_windows = get_windows_from_imu_signals(
+                    imu_data,
+                    sampling_frequency=movement_sampling_frequency,
+                    window_width=window_width,
+                    window_overlap=window_overlap)
+
+                if len(audio_windows) - len(imu_windows) == 1:
+                    logger.info('Removing last audio window in order to align with imu windows !')
+                    audio_windows = audio_windows[:-1]
+
+                assert len(audio_windows) == len(imu_windows),\
+                    f'''Number of windows mismatched between audio
+                        ({len(audio_windows)}) and IMU data ({len(imu_windows)}).'''
+
+            # Get window labels.
+            window_labes = get_windows_labels(
+                df_segment_labels,
+                len(audio_windows),
+                window_width=window_width,
+                window_overlap=window_overlap,
+                label_overlapping_threshold=label_overlapping_threshold,
+                no_event_class_name=no_event_class_name)
+
+            segment_windows = []
+            imu_channels = 0
+
+            if dataset_has_movement_data:
+                imu_channels = len(imu_windows[0])
+
+            for i in range(len(audio_windows)):
+                window_channels = []
+                window_channels.append(audio_windows[i])
+
+                if dataset_has_movement_data:
+                    for c_i in range(imu_channels):
+                        window_channels.append(imu_windows[i][c_i])
+                segment_windows.append(window_channels)
+
+            # Construct final results.
+            X_dataset_segments[segment_name] = segment_windows
+            y_dataset_segments[segment_name] = window_labes
+
+        X[dataset] = X_dataset_segments
+        y[dataset] = y_dataset_segments
+
+    # Create cache item.
+    cache.save(
+        X,
+        y,
+        data_source_names=data_source_names,
+        audio_sampling_frequency=audio_sampling_frequency,
+        movement_sampling_frequency=movement_sampling_frequency,
+        window_width=window_width,
+        window_overlap=window_overlap,
+        label_overlapping_threshold=label_overlapping_threshold,
+        filter_noises=filter_noises,
+        include_movement_magnitudes=include_movement_magnitudes,
+        no_event_class_name=no_event_class_name,
+        filters=filters)
+
+    return X, y
+
+
+def get_windows_from_audio_signal(
+        signal,
+        sampling_frequency,
+        window_width,
+        window_overlap):
+    ''' Generate signal chunks using a fixed time window.
+
+    Parameters
+    ----------
+    signal : NumPy array
+        Signal values.
+    sampling_frequency : int
+        Number of samples per second.
+    window_width : float
+        Size of window in seconds used to split signals.
+    window_overlap : float
+        Overlapping proportion between to consecutive windows (0.00 - 1.00).
+
+    Returns
+    -------
+    windows : list of lists.
+        Extracted windows.
+    '''
+    windows = librosa.util.frame(signal,
+                                 frame_length=int(sampling_frequency * window_width),
+                                 hop_length=int((1 - window_overlap) * int(sampling_frequency *
+                                                                           window_width)),
+                                 axis=0)
+
+    return windows
+
+
+def get_windows_from_imu_signals(
+        imu_data,
+        sampling_frequency,
+        window_width,
+        window_overlap):
+    ''' Generate signal chunks using a fixed time window.
+
+    Parameters
+    ----------
+    signal : NumPy array
+        Signal values.
+    sampling_frequency : int
+        Number of samples per second.
+    window_width : float
+        Size of window in seconds used to split signals.
+    window_overlap : float
+        Overlapping proportion between to consecutive windows (0.00 - 1.00).
+
+    Returns
+    -------
+    windows : list of lists.
+        Extracted windows.
+    '''
+
+    hop_length = int((1 - window_overlap) * int(sampling_frequency * window_width))
+    frame_length = int(sampling_frequency * window_width)
+
+    signals = []
+    for ix in range(len(imu_data)):
+        signals.append(
+            librosa.util.frame(imu_data[ix],
+                               frame_length=frame_length,
+                               hop_length=hop_length,
+                               axis=0))
+
+    return list(map(list, zip(*signals)))
+
+
+def get_windows_labels(
+        labels,
+        n_windows,
+        window_width,
+        window_overlap,
+        label_overlapping_threshold,
+        no_event_class_name):
+    ''' Extract labels for each window.
+
+    Parameters
+    ----------
+    labels : pandas DataFrame instance.
+        Labels information including start, end and event.
+    n_windows : int
+        Number of windows.
+    window_width : float
+        Size of window in seconds used to split signals.
+    window_overlap : float
+        Percentage of overlapping between to consecutive windows (0-100%).
+    label_overlapping_threshold : float
+        Minimun threshold to assign a label to frame w.r.t. window width (0-100%).
+    no_event_class_name : str
+        Class name to represent the absense of an event of interest.
+
+    Returns
+    -------
+    window_labels : list
+        Corresponding label for each window.
+    '''
+    window_start = 0
+    window_end = window_width
+
+    window_labels = []
+
+    labels['not_used'] = True
+
+    for i in range(n_windows):
+        labels_matched = labels[(labels.start <= window_end) & (labels.end >= window_start)]
+
+        if len(labels_matched) > 0:
+            overlappings = []
+            for index, label in labels_matched.iterrows():
+                event_duration = label.end - label.start
+                overlap_in_seconds = min(label.end, window_end) - max(label.start, window_start)
+                overlappings.append((overlap_in_seconds,
+                                     label.jm_event,
+                                     index,
+                                     event_duration))
+
+            # Sort all labels with overlap.
+            overlappings.sort(key=lambda tup: tup[0], reverse=True)
+
+            exist_overlap_for_window = False
+            for ix_o, overlap in enumerate(overlappings):
+                # If the window contains the entire event, asign the label.
+                # event:            |     |
+                # window:        |            |
+                window_contains_the_event = (overlap[0] / overlap[3]) == 1
+
+                # If overlap % compared to window width reachs the threshold, asign the label.
+                # event:        | ------|       - (overlap)
+                # window:        |------   |
+                relative_overlap = (overlap[0] / window_width)
+                overlap_reachs_threshold = relative_overlap >= label_overlapping_threshold
+
+                # If any of created conditions is True, then asign the label to the window.
+                if (window_contains_the_event or overlap_reachs_threshold):
+                    exist_overlap_for_window = True
+
+                    # If overlap is enough, the label of event with more overlap will be used.
+                    window_labels.append(overlap[1])
+
+                    # All events with enough overlap are used.
+                    labels.loc[overlap[2], 'not_used'] = False
+
+                    break
+
+            if not exist_overlap_for_window:
+                window_labels.append(no_event_class_name)
+        else:
+            window_labels.append(no_event_class_name)
+
+        window_start = window_start + window_width * (1 - window_overlap)
+        window_end = window_start + window_width
+
+    not_used_labels = labels[(labels.jm_event != 'u') & (labels.not_used)]
+    if len(not_used_labels) > 0:
+        logger.info('Some labels have not been used: %s', str(len(not_used_labels)))
+    else:
+        logger.info('All labels have been used.')
+
+    return window_labels
+\nFile: ./src/chewbite_fusion/data/.ipynb_checkpoints/utils-checkpoint.py
+import os
+
+import numpy as np
+import pandas as pd
+from scipy.interpolate import interp1d
+
+
+def windows2events(y_pred,
+                   window_width=0.5,
+                   window_overlap=0.5):
+    """ Convert predictions from window-level to event-level.
+
+    Parameters
+    ----------
+    y_true : tensor or numpy.array[str]
+        1D data structure with labels (window-level) for a refence input segment.
+    y_pred : tensor or numpy.array[str]
+        1D data structure with predictions (window-level) for a refence input segment.
+    window_width : float
+        Size of window in seconds used to split signals.
+    window_overlap : float
+        Overlapping proportion between to consecutive windows (0.00 - 1.00).
+    no_event_class : str
+        Identifier used to represent the absence of an event of interest.
+
+    Returns
+    -------
+    df_pred : pandas DataFrame instance.
+        DataFrame with start, end and label columns.
+    """
+
+    window_starts = np.array(list(range(len(y_pred)))) *\
+        (window_width - (window_width * window_overlap))
+    window_ends = window_starts + window_width
+
+    df_pred = pd.DataFrame({
+        "start": window_starts,
+        "end": window_ends,
+        "label": y_pred
+    })
+
+    df_pred = merge_contiguous(df_pred)
+    return df_pred
+
+
+def merge_contiguous(df):
+    """ Given a pandas DataFrame with start, end and label columns it will merge
+        contiguous equally labeled. """
+
+    for i in df.index[:-1]:
+        next_label = df.loc[i + 1].label
+        if next_label == df.loc[i].label:
+            df.loc[i + 1, "start"] = df.loc[i].start
+            df.drop(i, inplace=True)
+
+    return df
+
+
+def load_imu_data_from_file(filename):
+    ''' Read IMU data stored from Android app and return a Pandas DataFrame instance.
+
+    Params
+    ------
+    filename : str
+        Complete path to the file to be loaded.
+
+    Return
+    ------
+    df : Data-Frame instance.
+        Pandas Data-Frame instance with the following 4 columns:
+        - timestamp_sec: timestamp in seconds.
+        - {a, g, m}x: signal on x axis.
+        - {a, g, m}y: signal on y axis.
+        - {a, g, m}z: signal on z axis.
+    '''
+
+    # Extract first letter from file name.
+    char = os.path.basename(filename)[0]  # a: accelerometer, g: gyroscope, m:magnetometer
+
+    dt = np.dtype([('timestamp', '>i8'),
+                   (char + 'x', '>f4'),
+                   (char + 'y', '>f4'),
+                   (char + 'z', '>f4')])
+
+    with open(filename, 'rb') as f:
+        file_data = np.fromfile(f, dtype=dt).byteswap().newbyteorder()
+        df = pd.DataFrame(file_data, columns=file_data.dtype.names)
+
+    df["timestamp"] = df["timestamp"] / 1e9
+    df.rename(columns={"timestamp": "timestamp_sec"}, inplace=True)
+    df["timestamp_relative"] = df.timestamp_sec - df.timestamp_sec.values[0]
+
+    return df
+
+
+def resample_imu_signal(data, signal_duration_sec, frequency, interpolation_kind='linear'):
+    ''' Resample a given signal.
+
+    Params
+    ------
+    data : Data-Frame instance.
+        Data loaded using load_data_from_file method.
+
+    signal_duration_sec : float.
+        Total desired duration in seconds (used in order to short resulting signal).
+
+    frequency : int.
+        Target frequency.
+
+    interpolation_kind : str.
+        Interpolation method used.
+
+    Return
+    ------
+    df : Data-Frame instance.
+        Pandas Data-Frame instance with interpolated signals.
+    '''
+    axis_cols = [c for c in data.columns if 'timestamp' not in c]
+
+    sequence_end = int(data.timestamp_relative.max()) + 1
+    x_values = np.linspace(0, sequence_end,
+                           sequence_end * frequency,
+                           endpoint=False)
+
+    df = pd.DataFrame({'timestamp_relative': x_values})
+    df = df[df.timestamp_relative <= signal_duration_sec]
+
+    for col in axis_cols:
+        interpolator = interp1d(data['timestamp_relative'],
+                                data[col],
+                                kind=interpolation_kind)
+
+        df[col] = interpolator(df.timestamp_relative.values)
+
+    return df
+\nFile: ./src/chewbite_fusion/data/.ipynb_checkpoints/utils_data_sources-checkpoint.py
+from collections import namedtuple
+import os
+import glob
+
+from chewbite_fusion.data.settings import DATA_SOURCES_PATH
+
+
+def list_datasets():
+    """ Return a dictionary with available datasets. """
+
+    Dataset = namedtuple("dataset",
+                         ["str_id", "name", "folder", "audio_files_format",
+                          "audio_sampling_frequency", "imu_sampling_frequency", "multimodal"])
+
+    assert os.path.exists(DATA_SOURCES_PATH), f"Path {DATA_SOURCES_PATH} does not exist."
+
+    datasets = {
+        'zavalla2022': Dataset(
+            str_id="jm2022",
+            name="Jaw Movement 2022 Dataset with Smartphones used a recording device.",
+            folder=os.path.join(DATA_SOURCES_PATH, "jm2022"),
+            audio_files_format="wav",
+            audio_sampling_frequency=22050,
+            imu_sampling_frequency=100,
+            multimodal=True
+        )
+    }
+
+    return datasets
+
+
+def get_files_in_dataset(dataset):
+    """ Get list of files included in given dataset instance. """
+
+    if dataset.audio_files_format == "wav":
+        ext = "wav"
+
+    dataset_files = []
+    labels_file_list = sorted(glob.glob(os.path.join(dataset.folder, "*labels.txt")))
+
+    for label_file in labels_file_list:
+        audio_file = label_file.replace('_labels.txt', '.' + ext)
+
+        files_group = [audio_file]
+        if dataset.multimodal:
+            for sensor in ['acc', 'gyr', 'mag']:
+                for axis in ['x', 'y', 'z']:
+                    file = label_file.replace('_labels.txt', f'_{sensor}_{axis}.txt')
+                    files_group.append(file)
+        files_group.append(label_file)
+
+        # Check if files exist.
+        for file in files_group:
+            assert os.path.isfile(file), f'Could not find a specific file: {file}'
+
+        dataset_files.append(tuple(files_group))
+
+    return dataset_files
+\nFile: ./src/chewbite_fusion/data/.ipynb_checkpoints/settings-checkpoint.py
+DATA_SOURCES_PATH = ''
+CACHE_DIR = ''
+\nFile: ./src/chewbite_fusion/data/.ipynb_checkpoints/__init__-checkpoint.py
+\nFile: ./src/chewbite_fusion/data/.ipynb_checkpoints/cache_manager-checkpoint.py
+import os
+import logging
+import joblib
+import hashlib
+from datetime import datetime as dt
+
+import pandas as pd
+
+from chewbite_fusion.data.settings import CACHE_DIR
+
+logger = logging.getLogger(__name__)
+
+
+CACHE_INDEX_NAME = 'cache_index.txt'
+
+
+class DatasetCache():
+    ''' Implement cache-like structure to store and retrieve datasets files. '''
+
+    def __init__(self):
+        self.timestamp = dt.now().strftime("%Y%m%d_%H%M%S")
+
+        self.index_file = os.path.join(CACHE_DIR, CACHE_INDEX_NAME)
+
+        if not os.path.isfile(self.index_file):
+            self.cache_index = pd.DataFrame(columns=['item', 'params'])
+        else:
+            self.cache_index = pd.read_csv(self.index_file, index_col=0, names=['item', 'params'], sep='\t')
+
+    def __get_filters_names__(self, **kargs):
+        filters = []
+        if ('filters' in kargs) and kargs['filters']:
+            for i in kargs['filters']:
+                filters.append((i[0].__name__, i[1]))
+
+        kargs['filters'] = filters
+
+        return kargs
+
+    def load(self, **kargs):
+        kargs = self.__get_filters_names__(**kargs)
+        cache_item_key = '__'.join([f'{str(key)}-{str(value)}' for key, value in kargs.items()])
+        logger.info(cache_item_key)
+
+        item_key = hashlib.sha256(cache_item_key.encode(encoding='UTF-8')).hexdigest()
+
+        if item_key in self.cache_index.index:
+            cache_item_match = self.cache_index.loc[item_key]
+            assert sum([m == item_key for m in self.cache_index.index]) == 1, \
+                f'Duplicated entries for cache item ! {cache_item_key}'
+
+            cache_item = joblib.load(os.path.join(CACHE_DIR, cache_item_match['item']))
+            X = cache_item['X']
+            y = cache_item['y']
+
+            return (X, y)
+
+        return None
+
+    def save(self, X, y, **kargs):
+        kargs = self.__get_filters_names__(**kargs)
+        cache_item_key = '__'.join([f'{str(key)}-{str(value)}' for key, value in kargs.items()])
+
+        cache_item = {
+            'X': X,
+            'y': y
+        }
+
+        cache_item = joblib.dump(cache_item, os.path.join(CACHE_DIR, self.timestamp + '.pkl'))
+
+        item_key = hashlib.sha256(cache_item_key.encode(encoding='UTF-8')).hexdigest()
+        self.cache_index.loc[item_key] = [self.timestamp + '.pkl', cache_item_key]
+        self.cache_index.to_csv(self.index_file, header=None, sep='\t')
+\nFile: ./src/chewbite_fusion/data/utils_data_sources.py
+from collections import namedtuple
+import os
+import glob
+
+from chewbite_fusion.data.settings import DATA_SOURCES_PATH
+
+
+def list_datasets():
+    """ Return a dictionary with available datasets. """
+
+    Dataset = namedtuple("dataset",
+                         ["str_id", "name", "folder", "audio_files_format",
+                          "audio_sampling_frequency", "imu_sampling_frequency", "multimodal"])
+
+    assert os.path.exists(DATA_SOURCES_PATH), f"Path {DATA_SOURCES_PATH} does not exist."
+
+    datasets = {
+        'zavalla2022': Dataset(
+            str_id="jm2022",
+            name="Jaw Movement 2022 Dataset with Smartphones used a recording device.",
+            folder=os.path.join(DATA_SOURCES_PATH, "jm2022"),
+            audio_files_format="wav",
+            audio_sampling_frequency=22050,
+            imu_sampling_frequency=100,
+            multimodal=True
+        )
+    }
+
+    return datasets
+
+
+def get_files_in_dataset(dataset):
+    """ Get list of files included in given dataset instance. """
+
+    if dataset.audio_files_format == "wav":
+        ext = "wav"
+
+    dataset_files = []
+    labels_file_list = sorted(glob.glob(os.path.join(dataset.folder, "*labels.txt")))
+
+    for label_file in labels_file_list:
+        audio_file = label_file.replace('_labels.txt', '.' + ext)
+
+        files_group = [audio_file]
+        if dataset.multimodal:
+            for sensor in ['acc', 'gyr', 'mag']:
+                for axis in ['x', 'y', 'z']:
+                    file = label_file.replace('_labels.txt', f'_{sensor}_{axis}.txt')
+                    files_group.append(file)
+        files_group.append(label_file)
+
+        # Check if files exist.
+        for file in files_group:
+            assert os.path.isfile(file), f'Could not find a specific file: {file}'
+
+        dataset_files.append(tuple(files_group))
+
+    return dataset_files
+\nFile: ./src/chewbite_fusion/data/make_dataset.py
+# -*- coding: utf-8 -*-
+import logging
+import os
+
+import numpy as np
+import pandas as pd
+from scipy import signal
+import librosa
+import more_itertools
+
+from chewbite_fusion.data.cache_manager import DatasetCache
+from chewbite_fusion.data import utils_data_sources as utils
+
+
+logger = logging.getLogger(__name__)
+
+
+def main(data_source_names=['zavalla2022'],
+         audio_sampling_frequency=8000,
+         movement_sampling_frequency=100,
+         window_width=0.5,
+         window_overlap=0.5,
+         label_overlapping_threshold=0.5,
+         filter_noises=True,
+         include_movement_magnitudes=False,
+         no_event_class_name='no-event',
+         filters=None,
+         invalidate_cache=False):
+    """ Run data processing scripts to turn raw data from (../raw) into
+        cleaned data ready to be analyzed (saved in ../processed).
+
+        Parameters
+        ----------
+        data_source_names : list of str
+            List of all data source names to be included in the final dataset.
+            At this moment there is one option valid: 'zavalla2022'.
+        audio_sampling_frequency : int or float
+            Sampling frequency of audio source files.
+        movement_sampling_frequency : int or float
+            Sampling frequency of IMU source files.
+        window_width : float
+            Size of window in seconds used to split signals.
+        window_overlap : float
+            Overlapping proportion between to consecutive windows (0.00 - 1.00).
+        label_overlapping_threshold : float
+            Minimun threshold to assign a label to frame w.r.t. window width (0.00 - 1.00).
+        filter_noises : bool
+            Define if parts of original signals which include noises are included.
+        include_movement_magnitudes : bool
+            Define if magnitudes of IMU data are calculated.
+        no_event_class_name : str
+            Class name to represent the absense of an event of interest.
+        filters : list of tuples.
+            List of filters, channels and a flag to indicate if applied to movement signals.
+            For example, [(signal.butter(10, 15, 'hp'), [0, 1, 2], True)]
+                apply a 15th order high-pass Butterworth filter to acceleromter x, y and z axis.
+        invalidate_cache : bool
+            Force to update cache.
+
+        Returns
+        -------
+        X : Dictionary-like object, with data sources as keys.
+            Each value represent segments of data, and include all extracted windows.
+            Example:
+            X = {
+                'zavalla2022': {
+                    'segment_1_cel_1': [
+                        [
+                                                    # window 1
+                            [0.83, 0.55, 0.21],     # audio mono
+                            [0.0, 0.1, 0.17],       # acc x
+                            [0.0, 0.52, 0.49],      # acc y
+                            [0.0, -0.07, -0.14],    # acc z
+                            [0.0, 0.1, 0.17],       # gyr x
+                            [0.0, 0.52, 0.49],      # gyr y
+                            [0.0, -0.07, -0.14],    # gyr z
+                            [0.0, 0.1, 0.17],       # mag x
+                            [0.0, 0.52, 0.49],      # mag y
+                            [0.0, -0.07, -0.14],    # mag z
+                                                    # OPTIONAL
+                            [0.2, -0.08, 1.15],     # acc magnitude
+                            [0.0, 0.0, 0.1],        # gyr magnitude
+                            [1.0, 0.97, 0.89],      # mag magnitude
+                        ],
+                        [
+                            ...
+                        ]
+                    ]
+                }
+            }
+        y : Dictionary-like object, with data sources as keys.
+            Each value represent segments of data, and include labels for each window.
+            Example:
+            y = {
+                'zavalla2022': {
+                    'segment_1_cel_1': [
+                        'no-event',                 # window 1
+                        'no-event',                 # window 2
+                        'chew',                     # window 3
+                        ...
+                    ],
+                    ...
+                }
+            }
+    """
+    logger = logging.getLogger(__name__)
+
+    cache = DatasetCache()
+
+    # Try to retrieve elements from cache.
+    cache_item = cache.load(
+        data_source_names=data_source_names,
+        audio_sampling_frequency=audio_sampling_frequency,
+        movement_sampling_frequency=movement_sampling_frequency,
+        window_width=window_width,
+        window_overlap=window_overlap,
+        label_overlapping_threshold=label_overlapping_threshold,
+        filter_noises=filter_noises,
+        include_movement_magnitudes=include_movement_magnitudes,
+        no_event_class_name=no_event_class_name,
+        filters=filters)
+
+    if cache_item and not invalidate_cache:
+        logger.info('*** Retrieving dataset from cache ! ***')
+        (X, y) = cache_item
+
+        return X, y
+
+    logger.info('*** Creating dataset from scratch ! ***')
+    available_datasets = utils.list_datasets()
+
+    for data_source_name in data_source_names:
+        assert data_source_name in available_datasets, \
+            f'Provided data source name {data_source_name} not available.'
+
+    assert (audio_sampling_frequency * window_width) % 5 == 0, \
+        '''Incompatible audio sampling frequency and window width
+           (Validation condition: audio_sampling_frequency * window_width) % 5).'''
+
+    assert (audio_sampling_frequency * window_width * (1 - window_overlap)) % 5 == 0, \
+        '''Incompatible audio sampling frequency and window overlap
+           (Validation condition:
+           audio_sampling_frequency * window_width * (1 - window_overlap)) % 5).'''
+
+    assert (movement_sampling_frequency * window_width) % 5 == 0, \
+        '''Incompatible movement sampling frequency and window width
+           (Validation condition: movement_sampling_frequency * window_width) % 5).'''
+
+    assert (movement_sampling_frequency * window_width * (1 - window_overlap)) % 5 == 0, \
+        '''Incompatible movement sampling frequency and window overlap
+           (Validation condition:
+           movement_sampling_frequency * window_width * (1 - window_overlap)) % 5).'''
+
+    X = {}
+    y = {}
+
+    for dataset in data_source_names:
+        segment_files = utils.get_files_in_dataset(available_datasets[dataset])
+
+        X_dataset_segments = {}
+        y_dataset_segments = {}
+        for segment in segment_files:
+            segment_name = os.path.basename(segment[0]).split('.')[0]
+            logger.info("> Processing segment: %s", segment_name)
+
+            # Read audio file.
+            audio_signal, sf = librosa.load(segment[0])
+            audio_signal = librosa.resample(y=audio_signal,
+                                            orig_sr=sf,
+                                            target_sr=audio_sampling_frequency)
+
+            dataset_has_movement_data = len(segment) > 2
+
+            # Read IMU files.
+            imu_data = []
+
+            if dataset_has_movement_data:
+                for i in range(1, 10):
+                    signal_axis_values = pd.read_csv(segment[i],
+                                                    names=['axis_value']).axis_value.values
+                    data_sampling_frequency = available_datasets[dataset].imu_sampling_frequency
+                    if data_sampling_frequency != movement_sampling_frequency:
+                        sampling_relation = data_sampling_frequency / movement_sampling_frequency
+
+                        signal_decimated = signal.decimate(signal_axis_values,
+                                                        int(sampling_relation))
+                        imu_data.append(signal_decimated)
+                    else:
+                        imu_data.append(signal_axis_values)
+
+                if include_movement_magnitudes:
+                    accelerometer_magnitude = \
+                        np.sqrt(imu_data[0] ** 2 + imu_data[1] ** 2 + imu_data[2] ** 2)
+                    imu_data.append(accelerometer_magnitude)
+                    gyroscope_magnitude = \
+                        np.sqrt(imu_data[3] ** 2 + imu_data[4] ** 2 + imu_data[5] ** 2)
+                    imu_data.append(gyroscope_magnitude)
+                    magnetometer_magnitude = \
+                        np.sqrt(imu_data[6] ** 2 + imu_data[7] ** 2 + imu_data[8] ** 2)
+                    imu_data.append(magnetometer_magnitude)
+
+            if filters:
+                for filter in filters:
+                    for channel in filter[1]:
+                        filter_method = filter[0]
+                        if filter[2] and dataset_has_movement_data:
+                            imu_data[channel] = filter_method(imu_data[channel])
+                        else:
+                            audio_signal = filter_method(audio_signal)
+
+            # Read labels file.
+            df_segment_labels = pd.read_csv(
+                segment[-1],
+                sep='\t',
+                names=["start", "end", "jm_event"])
+
+            general_mask = df_segment_labels.jm_event
+            df_segment_labels.loc[general_mask == 'u', 'jm_event'] = 'unknown'
+            df_segment_labels.loc[general_mask == 'b', 'jm_event'] = 'bite'
+            df_segment_labels.loc[general_mask == 'c', 'jm_event'] = 'grazing-chew'
+            df_segment_labels.loc[general_mask == 'r', 'jm_event'] = 'rumination-chew'
+            df_segment_labels.loc[general_mask == 'x', 'jm_event'] = 'chewbite'
+
+            # Get windows from signals.
+            audio_windows = get_windows_from_audio_signal(
+                audio_signal,
+                sampling_frequency=audio_sampling_frequency,
+                window_width=window_width,
+                window_overlap=window_overlap)
+
+            imu_windows = []
+            if dataset_has_movement_data:
+                imu_windows = get_windows_from_imu_signals(
+                    imu_data,
+                    sampling_frequency=movement_sampling_frequency,
+                    window_width=window_width,
+                    window_overlap=window_overlap)
+
+                if len(audio_windows) - len(imu_windows) == 1:
+                    logger.info('Removing last audio window in order to align with imu windows !')
+                    audio_windows = audio_windows[:-1]
+
+                assert len(audio_windows) == len(imu_windows),\
+                    f'''Number of windows mismatched between audio
+                        ({len(audio_windows)}) and IMU data ({len(imu_windows)}).'''
+
+            # Get window labels.
+            window_labes = get_windows_labels(
+                df_segment_labels,
+                len(audio_windows),
+                window_width=window_width,
+                window_overlap=window_overlap,
+                label_overlapping_threshold=label_overlapping_threshold,
+                no_event_class_name=no_event_class_name)
+
+            segment_windows = []
+            imu_channels = 0
+
+            if dataset_has_movement_data:
+                imu_channels = len(imu_windows[0])
+
+            for i in range(len(audio_windows)):
+                window_channels = []
+                window_channels.append(audio_windows[i])
+
+                if dataset_has_movement_data:
+                    for c_i in range(imu_channels):
+                        window_channels.append(imu_windows[i][c_i])
+                segment_windows.append(window_channels)
+
+            # Construct final results.
+            X_dataset_segments[segment_name] = segment_windows
+            y_dataset_segments[segment_name] = window_labes
+
+        X[dataset] = X_dataset_segments
+        y[dataset] = y_dataset_segments
+
+    # Create cache item.
+    cache.save(
+        X,
+        y,
+        data_source_names=data_source_names,
+        audio_sampling_frequency=audio_sampling_frequency,
+        movement_sampling_frequency=movement_sampling_frequency,
+        window_width=window_width,
+        window_overlap=window_overlap,
+        label_overlapping_threshold=label_overlapping_threshold,
+        filter_noises=filter_noises,
+        include_movement_magnitudes=include_movement_magnitudes,
+        no_event_class_name=no_event_class_name,
+        filters=filters)
+
+    return X, y
+
+
+def get_windows_from_audio_signal(
+        signal,
+        sampling_frequency,
+        window_width,
+        window_overlap):
+    ''' Generate signal chunks using a fixed time window.
+
+    Parameters
+    ----------
+    signal : NumPy array
+        Signal values.
+    sampling_frequency : int
+        Number of samples per second.
+    window_width : float
+        Size of window in seconds used to split signals.
+    window_overlap : float
+        Overlapping proportion between to consecutive windows (0.00 - 1.00).
+
+    Returns
+    -------
+    windows : list of lists.
+        Extracted windows.
+    '''
+    windows = librosa.util.frame(signal,
+                                 frame_length=int(sampling_frequency * window_width),
+                                 hop_length=int((1 - window_overlap) * int(sampling_frequency *
+                                                                           window_width)),
+                                 axis=0)
+
+    return windows
+
+
+def get_windows_from_imu_signals(
+        imu_data,
+        sampling_frequency,
+        window_width,
+        window_overlap):
+    ''' Generate signal chunks using a fixed time window.
+
+    Parameters
+    ----------
+    signal : NumPy array
+        Signal values.
+    sampling_frequency : int
+        Number of samples per second.
+    window_width : float
+        Size of window in seconds used to split signals.
+    window_overlap : float
+        Overlapping proportion between to consecutive windows (0.00 - 1.00).
+
+    Returns
+    -------
+    windows : list of lists.
+        Extracted windows.
+    '''
+
+    hop_length = int((1 - window_overlap) * int(sampling_frequency * window_width))
+    frame_length = int(sampling_frequency * window_width)
+
+    signals = []
+    for ix in range(len(imu_data)):
+        signals.append(
+            librosa.util.frame(imu_data[ix],
+                               frame_length=frame_length,
+                               hop_length=hop_length,
+                               axis=0))
+
+    return list(map(list, zip(*signals)))
+
+
+def get_windows_labels(
+        labels,
+        n_windows,
+        window_width,
+        window_overlap,
+        label_overlapping_threshold,
+        no_event_class_name):
+    ''' Extract labels for each window.
+
+    Parameters
+    ----------
+    labels : pandas DataFrame instance.
+        Labels information including start, end and event.
+    n_windows : int
+        Number of windows.
+    window_width : float
+        Size of window in seconds used to split signals.
+    window_overlap : float
+        Percentage of overlapping between to consecutive windows (0-100%).
+    label_overlapping_threshold : float
+        Minimun threshold to assign a label to frame w.r.t. window width (0-100%).
+    no_event_class_name : str
+        Class name to represent the absense of an event of interest.
+
+    Returns
+    -------
+    window_labels : list
+        Corresponding label for each window.
+    '''
+    window_start = 0
+    window_end = window_width
+
+    window_labels = []
+
+    labels['not_used'] = True
+
+    for i in range(n_windows):
+        labels_matched = labels[(labels.start <= window_end) & (labels.end >= window_start)]
+
+        if len(labels_matched) > 0:
+            overlappings = []
+            for index, label in labels_matched.iterrows():
+                event_duration = label.end - label.start
+                overlap_in_seconds = min(label.end, window_end) - max(label.start, window_start)
+                overlappings.append((overlap_in_seconds,
+                                     label.jm_event,
+                                     index,
+                                     event_duration))
+
+            # Sort all labels with overlap.
+            overlappings.sort(key=lambda tup: tup[0], reverse=True)
+
+            exist_overlap_for_window = False
+            for ix_o, overlap in enumerate(overlappings):
+                # If the window contains the entire event, asign the label.
+                # event:            |     |
+                # window:        |            |
+                window_contains_the_event = (overlap[0] / overlap[3]) == 1
+
+                # If overlap % compared to window width reachs the threshold, asign the label.
+                # event:        | ------|       - (overlap)
+                # window:        |------   |
+                relative_overlap = (overlap[0] / window_width)
+                overlap_reachs_threshold = relative_overlap >= label_overlapping_threshold
+
+                # If any of created conditions is True, then asign the label to the window.
+                if (window_contains_the_event or overlap_reachs_threshold):
+                    exist_overlap_for_window = True
+
+                    # If overlap is enough, the label of event with more overlap will be used.
+                    window_labels.append(overlap[1])
+
+                    # All events with enough overlap are used.
+                    labels.loc[overlap[2], 'not_used'] = False
+
+                    break
+
+            if not exist_overlap_for_window:
+                window_labels.append(no_event_class_name)
+        else:
+            window_labels.append(no_event_class_name)
+
+        window_start = window_start + window_width * (1 - window_overlap)
+        window_end = window_start + window_width
+
+    not_used_labels = labels[(labels.jm_event != 'u') & (labels.not_used)]
+    if len(not_used_labels) > 0:
+        logger.info('Some labels have not been used: %s', str(len(not_used_labels)))
+    else:
+        logger.info('All labels have been used.')
+
+    return window_labels
+\nFile: ./src/chewbite_fusion/data/utils.py
+import os
+
+import numpy as np
+import pandas as pd
+from scipy.interpolate import interp1d
+
+
+def windows2events(y_pred,
+                   window_width=0.5,
+                   window_overlap=0.5):
+    """ Convert predictions from window-level to event-level.
+
+    Parameters
+    ----------
+    y_true : tensor or numpy.array[str]
+        1D data structure with labels (window-level) for a refence input segment.
+    y_pred : tensor or numpy.array[str]
+        1D data structure with predictions (window-level) for a refence input segment.
+    window_width : float
+        Size of window in seconds used to split signals.
+    window_overlap : float
+        Overlapping proportion between to consecutive windows (0.00 - 1.00).
+    no_event_class : str
+        Identifier used to represent the absence of an event of interest.
+
+    Returns
+    -------
+    df_pred : pandas DataFrame instance.
+        DataFrame with start, end and label columns.
+    """
+
+    window_starts = np.array(list(range(len(y_pred)))) *\
+        (window_width - (window_width * window_overlap))
+    window_ends = window_starts + window_width
+
+    df_pred = pd.DataFrame({
+        "start": window_starts,
+        "end": window_ends,
+        "label": y_pred
+    })
+
+    df_pred = merge_contiguous(df_pred)
+    return df_pred
+
+
+def merge_contiguous(df):
+    """ Given a pandas DataFrame with start, end and label columns it will merge
+        contiguous equally labeled. """
+
+    for i in df.index[:-1]:
+        next_label = df.loc[i + 1].label
+        if next_label == df.loc[i].label:
+            df.loc[i + 1, "start"] = df.loc[i].start
+            df.drop(i, inplace=True)
+
+    return df
+
+
+def load_imu_data_from_file(filename):
+    ''' Read IMU data stored from Android app and return a Pandas DataFrame instance.
+
+    Params
+    ------
+    filename : str
+        Complete path to the file to be loaded.
+
+    Return
+    ------
+    df : Data-Frame instance.
+        Pandas Data-Frame instance with the following 4 columns:
+        - timestamp_sec: timestamp in seconds.
+        - {a, g, m}x: signal on x axis.
+        - {a, g, m}y: signal on y axis.
+        - {a, g, m}z: signal on z axis.
+    '''
+
+    # Extract first letter from file name.
+    char = os.path.basename(filename)[0]  # a: accelerometer, g: gyroscope, m:magnetometer
+
+    dt = np.dtype([('timestamp', '>i8'),
+                   (char + 'x', '>f4'),
+                   (char + 'y', '>f4'),
+                   (char + 'z', '>f4')])
+
+    with open(filename, 'rb') as f:
+        file_data = np.fromfile(f, dtype=dt).byteswap().newbyteorder()
+        df = pd.DataFrame(file_data, columns=file_data.dtype.names)
+
+    df["timestamp"] = df["timestamp"] / 1e9
+    df.rename(columns={"timestamp": "timestamp_sec"}, inplace=True)
+    df["timestamp_relative"] = df.timestamp_sec - df.timestamp_sec.values[0]
+
+    return df
+
+
+def resample_imu_signal(data, signal_duration_sec, frequency, interpolation_kind='linear'):
+    ''' Resample a given signal.
+
+    Params
+    ------
+    data : Data-Frame instance.
+        Data loaded using load_data_from_file method.
+
+    signal_duration_sec : float.
+        Total desired duration in seconds (used in order to short resulting signal).
+
+    frequency : int.
+        Target frequency.
+
+    interpolation_kind : str.
+        Interpolation method used.
+
+    Return
+    ------
+    df : Data-Frame instance.
+        Pandas Data-Frame instance with interpolated signals.
+    '''
+    axis_cols = [c for c in data.columns if 'timestamp' not in c]
+
+    sequence_end = int(data.timestamp_relative.max()) + 1
+    x_values = np.linspace(0, sequence_end,
+                           sequence_end * frequency,
+                           endpoint=False)
+
+    df = pd.DataFrame({'timestamp_relative': x_values})
+    df = df[df.timestamp_relative <= signal_duration_sec]
+
+    for col in axis_cols:
+        interpolator = interp1d(data['timestamp_relative'],
+                                data[col],
+                                kind=interpolation_kind)
+
+        df[col] = interpolator(df.timestamp_relative.values)
+
+    return df
+\nFile: ./src/chewbite_fusion/data/cache_manager.py
+import os
+import logging
+import joblib
+import hashlib
+from datetime import datetime as dt
+
+import pandas as pd
+
+from chewbite_fusion.data.settings import CACHE_DIR
+
+logger = logging.getLogger(__name__)
+
+
+CACHE_INDEX_NAME = 'cache_index.txt'
+
+
+class DatasetCache():
+    ''' Implement cache-like structure to store and retrieve datasets files. '''
+
+    def __init__(self):
+        self.timestamp = dt.now().strftime("%Y%m%d_%H%M%S")
+
+        self.index_file = os.path.join(CACHE_DIR, CACHE_INDEX_NAME)
+
+        if not os.path.isfile(self.index_file):
+            self.cache_index = pd.DataFrame(columns=['item', 'params'])
+        else:
+            self.cache_index = pd.read_csv(self.index_file, index_col=0, names=['item', 'params'], sep='\t')
+
+    def __get_filters_names__(self, **kargs):
+        filters = []
+        if ('filters' in kargs) and kargs['filters']:
+            for i in kargs['filters']:
+                filters.append((i[0].__name__, i[1]))
+
+        kargs['filters'] = filters
+
+        return kargs
+
+    def load(self, **kargs):
+        kargs = self.__get_filters_names__(**kargs)
+        cache_item_key = '__'.join([f'{str(key)}-{str(value)}' for key, value in kargs.items()])
+        logger.info(cache_item_key)
+
+        item_key = hashlib.sha256(cache_item_key.encode(encoding='UTF-8')).hexdigest()
+
+        if item_key in self.cache_index.index:
+            cache_item_match = self.cache_index.loc[item_key]
+            assert sum([m == item_key for m in self.cache_index.index]) == 1, \
+                f'Duplicated entries for cache item ! {cache_item_key}'
+
+            cache_item = joblib.load(os.path.join(CACHE_DIR, cache_item_match['item']))
+            X = cache_item['X']
+            y = cache_item['y']
+
+            return (X, y)
+
+        return None
+
+    def save(self, X, y, **kargs):
+        kargs = self.__get_filters_names__(**kargs)
+        cache_item_key = '__'.join([f'{str(key)}-{str(value)}' for key, value in kargs.items()])
+
+        cache_item = {
+            'X': X,
+            'y': y
+        }
+
+        cache_item = joblib.dump(cache_item, os.path.join(CACHE_DIR, self.timestamp + '.pkl'))
+
+        item_key = hashlib.sha256(cache_item_key.encode(encoding='UTF-8')).hexdigest()
+        self.cache_index.loc[item_key] = [self.timestamp + '.pkl', cache_item_key]
+        self.cache_index.to_csv(self.index_file, header=None, sep='\t')
+\nFile: ./src/chewbite_fusion/data/__init__.py
+\nFile: ./src/chewbite_fusion/experiments/settings.py
+random_seed = 24
+experiments_path = ''
+collar_value = 0.2
+\nFile: ./src/chewbite_fusion/experiments/.ipynb_checkpoints/utils-checkpoint.py
+import os
+import glob
+import random as python_random
+
+import sed_eval
+import dcase_util
+import numpy as np
+import tensorflow as tf
+
+from chewbite_fusion.experiments import settings
+from chewbite_fusion.experiments.settings import random_seed
+
+
+def set_random_init():
+    # Random seeds initialization in order to force results reproducibility.
+    os.environ["PYTHONHASHSEED"] = str(random_seed)
+    python_random.seed(random_seed)
+    np.random.seed(random_seed)
+    tf.random.set_seed(random_seed)
+
+
+def get_experiment_results(experiment_path, full=False):
+    folds = {
+        '1': [45, 3, 23, 2, 17],
+        '2': [20, 42, 21, 1, 39],
+        '3': [28, 22, 33, 51, 55],
+        '4': [10, 40, 14, 41, 19],
+        '5': [47, 24, 7, 18]
+    }
+
+    target_files = glob.glob(os.path.join(experiment_path, 'segment_*_true.txt'))
+
+    fold_metrics = []
+
+    unique_labels = ['grazing-chew', 'rumination-chew', 'bite', 'chewbite']
+
+    for _, fold in folds.items():
+        file_list = []
+        fold_files = [f for f
+                      in target_files if int(os.path.basename(f).split('_')[1]) in fold]
+
+        for file in fold_files:
+            pred_file = file.replace('true', 'pred')
+            file_list.append({
+                'reference_file': file,
+                'estimated_file': pred_file
+            })
+
+        data = []
+
+        # Get used event labels
+        all_data = dcase_util.containers.MetaDataContainer()
+        for file_pair in file_list:
+            reference_event_list = sed_eval.io.load_event_list(
+                filename=file_pair['reference_file']
+            )
+            estimated_event_list = sed_eval.io.load_event_list(
+                filename=file_pair['estimated_file']
+            )
+
+            data.append({'reference_event_list': reference_event_list,
+                         'estimated_event_list': estimated_event_list})
+
+            all_data += reference_event_list
+
+        event_based_metrics = sed_eval.sound_event.EventBasedMetrics(
+            event_label_list=unique_labels,
+            t_collar=settings.collar_value
+        )
+
+        # Go through files
+        for file_pair in data:
+            event_based_metrics.evaluate(
+                reference_event_list=file_pair['reference_event_list'],
+                estimated_event_list=file_pair['estimated_event_list']
+            )
+
+        if full:
+            fold_metrics.append(event_based_metrics)
+        else:
+            fold_metrics.append(event_based_metrics.results_overall_metrics())
+
+    return fold_metrics
+\nFile: ./src/chewbite_fusion/experiments/.ipynb_checkpoints/settings-checkpoint.py
+random_seed = 24
+experiments_path = ''
+collar_value = 0.2
+\nFile: ./src/chewbite_fusion/experiments/.ipynb_checkpoints/base-checkpoint.py
+import os
+import logging
+import pickle
+from glob import glob
+from datetime import datetime as dt
+import hashlib
+
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import ParameterGrid
+import sed_eval
+import dcase_util
+
+from chewbite_fusion.data.utils import windows2events
+from chewbite_fusion.experiments import settings
+from chewbite_fusion.experiments.utils import set_random_init
+
+
+logger = logging.getLogger('yaer')
+
+
+class Experiment:
+    ''' Base class to represent an experiment using audio and movement signals. '''
+    def __init__(self,
+                 model_factory,
+                 features_factory,
+                 X,
+                 y,
+                 window_width,
+                 window_overlap,
+                 name,
+                 audio_sampling_frequency=8000,
+                 movement_sampling_frequency=100,
+                 no_event_class='no-event',
+                 manage_sequences=False,
+                 model_parameters_grid={},
+                 use_raw_data=False,
+                 quantization=None,
+                 data_augmentation=False):
+        self.timestamp = dt.now().strftime("%Y%m%d_%H%M%S")
+        self.model_factory = model_factory
+        self.features_factory = features_factory
+        self.X = X
+        self.y = y
+        self.window_width = window_width
+        self.window_overlap = window_overlap
+        self.name = name
+        self.audio_sampling_frequency = audio_sampling_frequency
+        self.movement_sampling_frequency = movement_sampling_frequency
+        self.no_event_class = no_event_class
+        self.manage_sequences = manage_sequences
+        self.model_parameters_grid = model_parameters_grid
+        self.use_raw_data = use_raw_data
+        self.train_validation_segments = []
+        self.quantization = quantization
+        self.data_augmentation = data_augmentation
+
+        # Create path for experiment if needed.
+        self.path = os.path.join(settings.experiments_path, name, self.timestamp)
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
+
+        # Add logger handlers (file and system stdout).
+        logger.handlers = []
+        fileHandler = logging.FileHandler(f"{self.path}/experiment.log")
+        formatter = logging.Formatter(fmt='%(asctime)s %(levelname)-8s %(message)s',
+                                      datefmt='%Y-%m-%d %H:%M:%S')
+        fileHandler.setFormatter(formatter)
+        logger.addHandler(fileHandler)
+
+        # Set random init.
+        set_random_init()
+
+    def run(self):
+        ''' Run the experiment and dump relevant information. '''
+        self.X = self.X['zavalla2022']
+        self.y = self.y['zavalla2022']
+
+        # Segment assigment to each fold. This was created using random
+        # sampling with stratified separation of rumination segments.
+        folds = {
+            '1': [45, 3, 23, 2, 17],
+            '2': [20, 42, 21, 1, 39],
+            '3': [28, 22, 33, 51, 55],
+            '4': [10, 40, 14, 41, 19],
+            '5': [47, 24, 7, 18]
+        }
+
+        for i in folds.values():
+            self.train_validation_segments.extend(i)
+
+        hash_method_instance = hashlib.new('sha256')
+        params_results = {}
+        full_grid = list(ParameterGrid(self.model_parameters_grid))
+
+        if len(full_grid) > 1:
+            for params_combination in full_grid:
+                if params_combination != {}:
+                    logger.info('Running folds for parameters combination: %s.',
+                                params_combination)
+                else:
+                    logger.info('Running folds without grid search.')
+
+                # Create parameters hash in order to compare results.
+                hash_method_instance.update(str(params_combination).encode())
+                params_combination_hash = hash_method_instance.hexdigest()
+
+                params_combination_result = self.execute_kfoldcv(
+                    folds=folds,
+                    is_grid_search=True,
+                    parameters_combination=params_combination)
+
+                # Store result and params dict to be used if selected.
+                params_results[params_combination_hash] = (params_combination_result,
+                                                           params_combination)
+
+            best_params_combination = max(params_results.values(), key=lambda i: i[0])[1]
+            logger.info('-' * 25)
+            logger.info('>>> All params combination values: %s <<<', str(params_results))
+            logger.info('-' * 25)
+            logger.info('>>> Best params combination: %s <<<', best_params_combination)
+        else:
+            logger.info('-' * 25)
+            logger.info('>>> Skipping grid search! No params dict provided. <<<')
+            best_params_combination = full_grid[0]
+
+        self.execute_kfoldcv(
+            folds=folds,
+            is_grid_search=False,
+            parameters_combination=best_params_combination)
+
+    def execute_kfoldcv(self,
+                        folds,
+                        is_grid_search,
+                        parameters_combination):
+        ''' Execute a k-fold cross validation using a specific set of parameters. '''
+        signal_predictions = {}
+
+        for ix_fold, fold in folds.items():
+            logger.info('Running fold number %s.', ix_fold)
+
+            test_fold_keys = [k for k in self.X.keys() if int(k.split('_')[1]) in fold]
+            train_fold_keys = [k for k in self.X.keys() if int(k.split('_')[1]) not in fold]
+            train_fold_keys = [k for k in train_fold_keys if \
+                int(k.split('_')[1]) in self.train_validation_segments]
+
+            logger.info('Train fold keys: %s.', str(train_fold_keys))
+            X_train = []
+            y_train = []
+            for train_signal_key in train_fold_keys:
+                if self.manage_sequences:
+                    X_train.append(self.X[train_signal_key])
+                    y_train.append(self.y[train_signal_key])
+                else:
+                    X_train.extend(self.X[train_signal_key])
+                    y_train.extend(self.y[train_signal_key])
+
+            if self.data_augmentation:
+                from augly.audio import functional
+                # Compute classes distribution.
+                all_y = []
+                n_labels = 0
+                for i_file in range(len(X_train)):
+                    for i_window in range(len(X_train[i_file])):
+                        if y_train[i_file][i_window] != 'no-event':
+                            all_y.append(y_train[i_file][i_window])
+                            n_labels += 1
+                unique, counts = np.unique(all_y, return_counts=True)
+                classes_probs = dict(zip(unique, counts / n_labels))
+
+                # Create a copy of all training samples.
+                import copy
+                X_augmented = copy.deepcopy(X_train)
+                y_augmented = copy.deepcopy(y_train)
+
+                for i_file in range(len(X_train)):
+                    during_event = False
+                    discard_event = False
+                    for i_window in range(len(X_train[i_file])):
+                        window_label = y_train[i_file][i_window]
+                        
+                        if window_label == 'no-event':
+                            during_event = False
+                            discard_event = False
+                        elif not during_event and window_label not in ['no-event',
+                                                                       'bite',
+                                                                       'rumination-chew']:
+                            during_event = True
+                            # If the windows correspond to a selected event to discard
+                            # from a majority class, select it to make zero values and 'no-event'.
+                            if np.random.rand() <= classes_probs[window_label] * 2:
+                                discard_event = True
+
+                        if during_event and discard_event:
+                            for i_channel in range(len(X_train[i_file][i_window])):
+                                window_len = len(X_augmented[i_file][i_window][i_channel])
+                                X_augmented[i_file][i_window][i_channel] = np.zeros(window_len)
+                                y_augmented[i_file][i_window] = 'no-event'
+                        else:
+                            for i_channel in range(len(X_train[i_file][i_window])):
+                                if i_channel == 0:
+                                    sample_rate = 6000
+                                else:
+                                    sample_rate = 100
+
+                                window = X_augmented[i_file][i_window][i_channel]
+                                X_augmented[i_file][i_window][i_channel] = \
+                                    functional.add_background_noise(window,
+                                                                    sample_rate,
+                                                                    snr_level_db=20)[0]
+                logger.info('Applying data augmentation !')
+                logger.info(len(X_train))
+                X_train.extend(X_augmented)
+                y_train.extend(y_augmented)
+                logger.info(len(X_train))
+
+            # Create label encoder and fit with unique values.
+            self.target_encoder = LabelEncoder()
+
+            unique_labels = np.unique(np.hstack(y_train))
+            self.target_encoder.fit(unique_labels)
+            if self.manage_sequences:
+                y_train_enc = []
+                for file_labels in y_train:
+                    y_train_enc.append(self.target_encoder.transform(file_labels))
+            else:
+                y_train_enc = self.target_encoder.transform(y_train)
+
+            model_instance = self.model_factory(parameters_combination)
+            self.model = model_instance
+            self.set_model_output_path(ix_fold, is_grid_search)
+
+            # Fit model and get predictions.
+            funnel = Funnel(self.features_factory,
+                            model_instance,
+                            self.audio_sampling_frequency,
+                            self.movement_sampling_frequency,
+                            self.use_raw_data)
+            funnel.fit(X_train, y_train_enc)
+
+            if self.quantization:
+                for ix_layer, layer in enumerate(funnel.model.model.layers):
+                    w = layer.get_weights()
+                    w = [i.astype(self.quantization) for i in w]
+                    funnel.model.model.layers[ix_layer].set_weights(w)
+                logger.info('quantization applied correctly !', str(self.quantization))
+
+            for test_signal_key in test_fold_keys:
+                if self.manage_sequences:
+                    X_test = [self.X[test_signal_key]]
+                else:
+                    X_test = self.X[test_signal_key]
+
+                y_signal_pred = funnel.predict(X_test)
+
+                if self.manage_sequences:
+                    y_signal_pred = y_signal_pred[0]
+
+                y_signal_pred_labels = self.target_encoder.inverse_transform(y_signal_pred)
+
+                y_test = self.y[test_signal_key]
+                signal_predictions[test_signal_key] = [y_test, y_signal_pred_labels]
+
+        logger.info('-' * 25)
+        logger.info('Fold iterations finished !. Starting evaluation phase.')
+
+        # Save predictions.
+        self.save_predictions(signal_predictions)
+
+        unique_labels = np.concatenate([self.y[k] for k in self.y.keys()])
+        unique_labels = list(set(unique_labels))
+
+        if self.no_event_class in unique_labels:
+            unique_labels.remove(self.no_event_class)
+
+        if is_grid_search:
+            fold_metrics = self.evaluate(unique_labels=unique_labels,
+                                         folds=folds,
+                                         verbose=False)
+        else:
+            # Log general information about experiment result.
+            logger.info('-' * 50)
+            logger.info('***** Classification results *****')
+            fold_metrics = self.evaluate(unique_labels=unique_labels,
+                                         folds=folds,
+                                         verbose=True)
+
+        return fold_metrics
+
+    def save_predictions(self,
+                         fold_labels_predictions):
+        ''' Save predictions to disk processing windows and labels. '''
+        df = pd.DataFrame(columns=['segment', 'y_true', 'y_pred'])
+
+        for segment in fold_labels_predictions.keys():
+            y_true = fold_labels_predictions[segment][0]
+            y_pred = fold_labels_predictions[segment][1]
+
+            _df = pd.DataFrame({
+                'y_true': y_true,
+                'y_pred': y_pred
+            })
+            _df['segment'] = segment
+            df = pd.concat([df, _df])
+
+            # Transform windows to events and save.
+            df_labels = windows2events(y_true,
+                                       self.window_width,
+                                       self.window_overlap)
+            # Remove no-event class.
+            df_labels = df_labels[df_labels.label != self.no_event_class]
+            df_labels.to_csv(os.path.join(self.path, segment + '_true.txt'),
+                             sep='\t',
+                             header=False,
+                             index=False)
+
+            df_predictions = windows2events(y_pred,
+                                            self.window_width,
+                                            self.window_overlap)
+            # Remove no-event class.
+            df_predictions = df_predictions[df_predictions.label != self.no_event_class]
+            df_predictions.to_csv(os.path.join(self.path, segment + '_pred.txt'),
+                                  sep='\t',
+                                  header=False,
+                                  index=False)
+
+        df.to_csv(os.path.join(self.path, 'fold_labels_and_predictions.csv'))
+
+    def evaluate(self, unique_labels, folds, verbose=True):
+        target_files = glob(os.path.join(self.path, 'segment_*_true.txt'))
+        final_metric = 'f_measure'
+
+        # Dictionary used to save selected metric per fold.
+        fold_metrics_detail = {}
+        fold_metrics = []
+
+        for ix_fold, fold in folds.items():
+            file_list = []
+            fold_files = [f for f
+                          in target_files if int(os.path.basename(f).split('_')[1]) in fold]
+            for file in fold_files:
+                pred_file = file.replace('true', 'pred')
+                file_list.append({
+                    'reference_file': file,
+                    'estimated_file': pred_file
+                })
+
+            data = []
+
+            # Get used event labels
+            all_data = dcase_util.containers.MetaDataContainer()
+            for file_pair in file_list:
+                reference_event_list = sed_eval.io.load_event_list(
+                    filename=file_pair['reference_file']
+                )
+                estimated_event_list = sed_eval.io.load_event_list(
+                    filename=file_pair['estimated_file']
+                )
+
+                data.append({'reference_event_list': reference_event_list,
+                             'estimated_event_list': estimated_event_list})
+
+                all_data += reference_event_list
+
+            # Create metrics classes, define parameters
+            segment_based_metrics = sed_eval.sound_event.SegmentBasedMetrics(
+                event_label_list=unique_labels,
+                time_resolution=settings.segment_width_value
+            )
+
+            event_based_metrics = sed_eval.sound_event.EventBasedMetrics(
+                event_label_list=unique_labels,
+                t_collar=settings.collar_value
+            )
+
+            # Go through files
+            for file_pair in data:
+                segment_based_metrics.evaluate(
+                    reference_event_list=file_pair['reference_event_list'],
+                    estimated_event_list=file_pair['estimated_event_list']
+                )
+
+                event_based_metrics.evaluate(
+                    reference_event_list=file_pair['reference_event_list'],
+                    estimated_event_list=file_pair['estimated_event_list']
+                )
+
+            # Dump metrics objects in order to facilitate comparision and reports generation.
+            metrics = {
+                'segment_based_metrics': segment_based_metrics,
+                'event_based_metrics': event_based_metrics
+            }
+
+            dump_file_name = f'experiment_metrics_fold_{ix_fold}.pkl'
+            with open(os.path.join(self.path, dump_file_name), 'wb') as handle:
+                pickle.dump(metrics, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+            segment_metrics = segment_based_metrics.results_overall_metrics()
+            event_metrics = event_based_metrics.results_overall_metrics()
+
+            if verbose:
+                logger.info('### Segment based metrics (fold %s) ###', ix_fold)
+                logger.info(segment_based_metrics)
+                logger.info('')
+                logger.info('### Event based metrics (fold %s) ###', ix_fold)
+                logger.info(event_based_metrics)
+                logger.info('-' * 20)
+
+            fold_metrics_detail[ix_fold] = {
+                'event_score': event_metrics[final_metric],
+                'segment_score': segment_metrics[final_metric]
+            }
+            fold_metrics.append(event_metrics[final_metric][final_metric])
+
+        dump_file_name = 'experiment_overall_metrics.pkl'
+        with open(os.path.join(self.path, dump_file_name), 'wb') as handle:
+            pickle.dump(fold_metrics_detail, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+        folds_mean = np.round(np.mean(fold_metrics), 6)
+        folds_std = np.round(np.std(fold_metrics), 6)
+
+        if verbose:
+            logger.info('### Event based overall metrics ###')
+            logger.info('F1 score (micro) mean for events: %s', str(folds_mean))
+            logger.info('F1 score (micro) standard deviation for events: %s', str(folds_std))
+            logger.info('-' * 20)
+
+        return folds_mean
+
+    def set_model_output_path(self, n_fold, is_grid_search=False):
+        output_logs_path = os.path.join(self.path, f'logs_fold_{n_fold}')
+        output_model_checkpoint_path = os.path.join(self.path, f'model_checkpoints_fold_{n_fold}')
+
+        # Skip validation of directory existance during grid search.
+        if not is_grid_search:
+            # Check if paths already exists
+            if os.path.exists(output_logs_path):
+                assert not os.path.exists(output_logs_path), 'Model output logs path already exists!'
+
+            if os.path.exists(output_model_checkpoint_path):
+                assert not os.path.exists(output_model_checkpoint_path), \
+                    'Model output checkpoints path already exists!'
+
+        # If not, create and save into model instance.
+        os.makedirs(output_logs_path)
+        self.model.output_logs_path = output_logs_path
+
+        os.makedirs(output_model_checkpoint_path)
+        self.model.output_path_model_checkpoints = output_model_checkpoint_path
+
+
+class Funnel:
+    ''' A similar interface to sklearn Pipeline, but transformations are applied in parallel. '''
+    def __init__(self,
+                 features_factory,
+                 model_instance,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency,
+                 use_raw_data=False):
+        self.features = features_factory(
+            audio_sampling_frequency,
+            movement_sampling_frequency).features
+        self.model = model_instance
+        self.use_raw_data = use_raw_data
+
+    def fit(self, X, y):
+        # Fit features and transform data.
+        X_features = []
+
+        for feature in self.features:
+            logger.info(f'Processing the feature {feature.feature.__class__.__name__}.')
+            X_features.append(feature.fit_transform(X, y))
+
+        if not self.use_raw_data:
+            X_features = np.concatenate(X_features, axis=1)
+
+        # Fit model.
+        logger.info('Training model ...')
+        self.model.fit(X_features, y)
+
+    def predict(self, X):
+        # Transform data using previously fitted features.
+        X_features = []
+
+        for feature in self.features:
+            X_features.append(feature.transform(X))
+
+        if not self.use_raw_data:
+            X_features = np.concatenate(X_features, axis=1)
+
+        # Get model predictions with transformed data.
+        return self.model.predict(X_features)
+\nFile: ./src/chewbite_fusion/experiments/.ipynb_checkpoints/deep_sound-checkpoint.py
+import logging
+
+from chewbite_fusion.models.deep_sound import DeepSound
+from chewbite_fusion.experiments.settings import random_seed
+from chewbite_fusion.data.make_dataset import main
+from chewbite_fusion.experiments.base import Experiment
+from chewbite_fusion.features.feature_factories import FeatureFactory_RawAudioData
+
+from yaer.base import experiment
+
+
+logger = logging.getLogger('yaer')
+
+
+def get_model_instance(variable_params):
+    return DeepSound(input_size=1800,
+                     output_size=6,
+                     n_epochs=1500,
+                     batch_size=10,
+                     training_reshape=True,
+                     set_sample_weights=True,
+                     feature_scaling=True)
+
+
+@experiment()
+def deep_sound():
+    """ Experiment with Deep Sound architecture.
+    """
+    window_width = 0.3
+    window_overlap = 0.5
+    X, y = main(window_width=window_width,
+                window_overlap=window_overlap,
+                include_movement_magnitudes=True,
+                audio_sampling_frequency=6000)
+
+    e = Experiment(get_model_instance,
+                   FeatureFactory_RawAudioData,
+                   X, y,
+                   window_width=window_width,
+                   window_overlap=window_overlap,
+                   name='deep_sound',
+                   manage_sequences=True,
+                   use_raw_data=True)
+
+    e.run()
+\nFile: ./src/chewbite_fusion/experiments/utils.py
+import os
+import glob
+import random as python_random
+
+import sed_eval
+import dcase_util
+import numpy as np
+import tensorflow as tf
+
+from chewbite_fusion.experiments import settings
+from chewbite_fusion.experiments.settings import random_seed
+
+
+def set_random_init():
+    # Random seeds initialization in order to force results reproducibility.
+    os.environ["PYTHONHASHSEED"] = str(random_seed)
+    python_random.seed(random_seed)
+    np.random.seed(random_seed)
+    tf.random.set_seed(random_seed)
+
+
+def get_experiment_results(experiment_path, full=False):
+    folds = {
+        '1': [45, 3, 23, 2, 17],
+        '2': [20, 42, 21, 1, 39],
+        '3': [28, 22, 33, 51, 55],
+        '4': [10, 40, 14, 41, 19],
+        '5': [47, 24, 7, 18]
+    }
+
+    target_files = glob.glob(os.path.join(experiment_path, 'segment_*_true.txt'))
+
+    fold_metrics = []
+
+    unique_labels = ['grazing-chew', 'rumination-chew', 'bite', 'chewbite']
+
+    for _, fold in folds.items():
+        file_list = []
+        fold_files = [f for f
+                      in target_files if int(os.path.basename(f).split('_')[1]) in fold]
+
+        for file in fold_files:
+            pred_file = file.replace('true', 'pred')
+            file_list.append({
+                'reference_file': file,
+                'estimated_file': pred_file
+            })
+
+        data = []
+
+        # Get used event labels
+        all_data = dcase_util.containers.MetaDataContainer()
+        for file_pair in file_list:
+            reference_event_list = sed_eval.io.load_event_list(
+                filename=file_pair['reference_file']
+            )
+            estimated_event_list = sed_eval.io.load_event_list(
+                filename=file_pair['estimated_file']
+            )
+
+            data.append({'reference_event_list': reference_event_list,
+                         'estimated_event_list': estimated_event_list})
+
+            all_data += reference_event_list
+
+        event_based_metrics = sed_eval.sound_event.EventBasedMetrics(
+            event_label_list=unique_labels,
+            t_collar=settings.collar_value
+        )
+
+        # Go through files
+        for file_pair in data:
+            event_based_metrics.evaluate(
+                reference_event_list=file_pair['reference_event_list'],
+                estimated_event_list=file_pair['estimated_event_list']
+            )
+
+        if full:
+            fold_metrics.append(event_based_metrics)
+        else:
+            fold_metrics.append(event_based_metrics.results_overall_metrics())
+
+    return fold_metrics
+\nFile: ./src/chewbite_fusion/experiments/base.py
+import os
+import logging
+import pickle
+from glob import glob
+from datetime import datetime as dt
+import hashlib
+
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import ParameterGrid
+import sed_eval
+import dcase_util
+
+from chewbite_fusion.data.utils import windows2events
+from chewbite_fusion.experiments import settings
+from chewbite_fusion.experiments.utils import set_random_init
+
+
+logger = logging.getLogger('yaer')
+
+
+class Experiment:
+    ''' Base class to represent an experiment using audio and movement signals. '''
+    def __init__(self,
+                 model_factory,
+                 features_factory,
+                 X,
+                 y,
+                 window_width,
+                 window_overlap,
+                 name,
+                 audio_sampling_frequency=8000,
+                 movement_sampling_frequency=100,
+                 no_event_class='no-event',
+                 manage_sequences=False,
+                 model_parameters_grid={},
+                 use_raw_data=False,
+                 quantization=None,
+                 data_augmentation=False):
+        self.timestamp = dt.now().strftime("%Y%m%d_%H%M%S")
+        self.model_factory = model_factory
+        self.features_factory = features_factory
+        self.X = X
+        self.y = y
+        self.window_width = window_width
+        self.window_overlap = window_overlap
+        self.name = name
+        self.audio_sampling_frequency = audio_sampling_frequency
+        self.movement_sampling_frequency = movement_sampling_frequency
+        self.no_event_class = no_event_class
+        self.manage_sequences = manage_sequences
+        self.model_parameters_grid = model_parameters_grid
+        self.use_raw_data = use_raw_data
+        self.train_validation_segments = []
+        self.quantization = quantization
+        self.data_augmentation = data_augmentation
+
+        # Create path for experiment if needed.
+        self.path = os.path.join(settings.experiments_path, name, self.timestamp)
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
+
+        # Add logger handlers (file and system stdout).
+        logger.handlers = []
+        fileHandler = logging.FileHandler(f"{self.path}/experiment.log")
+        formatter = logging.Formatter(fmt='%(asctime)s %(levelname)-8s %(message)s',
+                                      datefmt='%Y-%m-%d %H:%M:%S')
+        fileHandler.setFormatter(formatter)
+        logger.addHandler(fileHandler)
+
+        # Set random init.
+        set_random_init()
+
+    def run(self):
+        ''' Run the experiment and dump relevant information. '''
+        self.X = self.X['zavalla2022']
+        self.y = self.y['zavalla2022']
+
+        # Segment assigment to each fold. This was created using random
+        # sampling with stratified separation of rumination segments.
+        folds = {
+            '1': [45, 3, 23, 2, 17],
+            '2': [20, 42, 21, 1, 39],
+            '3': [28, 22, 33, 51, 55],
+            '4': [10, 40, 14, 41, 19],
+            '5': [47, 24, 7, 18]
+        }
+
+        for i in folds.values():
+            self.train_validation_segments.extend(i)
+
+        hash_method_instance = hashlib.new('sha256')
+        params_results = {}
+        full_grid = list(ParameterGrid(self.model_parameters_grid))
+
+        if len(full_grid) > 1:
+            for params_combination in full_grid:
+                if params_combination != {}:
+                    logger.info('Running folds for parameters combination: %s.',
+                                params_combination)
+                else:
+                    logger.info('Running folds without grid search.')
+
+                # Create parameters hash in order to compare results.
+                hash_method_instance.update(str(params_combination).encode())
+                params_combination_hash = hash_method_instance.hexdigest()
+
+                params_combination_result = self.execute_kfoldcv(
+                    folds=folds,
+                    is_grid_search=True,
+                    parameters_combination=params_combination)
+
+                # Store result and params dict to be used if selected.
+                params_results[params_combination_hash] = (params_combination_result,
+                                                           params_combination)
+
+            best_params_combination = max(params_results.values(), key=lambda i: i[0])[1]
+            logger.info('-' * 25)
+            logger.info('>>> All params combination values: %s <<<', str(params_results))
+            logger.info('-' * 25)
+            logger.info('>>> Best params combination: %s <<<', best_params_combination)
+        else:
+            logger.info('-' * 25)
+            logger.info('>>> Skipping grid search! No params dict provided. <<<')
+            best_params_combination = full_grid[0]
+
+        self.execute_kfoldcv(
+            folds=folds,
+            is_grid_search=False,
+            parameters_combination=best_params_combination)
+
+    def execute_kfoldcv(self,
+                        folds,
+                        is_grid_search,
+                        parameters_combination):
+        ''' Execute a k-fold cross validation using a specific set of parameters. '''
+        signal_predictions = {}
+
+        for ix_fold, fold in folds.items():
+            logger.info('Running fold number %s.', ix_fold)
+
+            test_fold_keys = [k for k in self.X.keys() if int(k.split('_')[1]) in fold]
+            train_fold_keys = [k for k in self.X.keys() if int(k.split('_')[1]) not in fold]
+            train_fold_keys = [k for k in train_fold_keys if \
+                int(k.split('_')[1]) in self.train_validation_segments]
+
+            logger.info('Train fold keys: %s.', str(train_fold_keys))
+            X_train = []
+            y_train = []
+            for train_signal_key in train_fold_keys:
+                if self.manage_sequences:
+                    X_train.append(self.X[train_signal_key])
+                    y_train.append(self.y[train_signal_key])
+                else:
+                    X_train.extend(self.X[train_signal_key])
+                    y_train.extend(self.y[train_signal_key])
+
+            if self.data_augmentation:
+                from augly.audio import functional
+                # Compute classes distribution.
+                all_y = []
+                n_labels = 0
+                for i_file in range(len(X_train)):
+                    for i_window in range(len(X_train[i_file])):
+                        if y_train[i_file][i_window] != 'no-event':
+                            all_y.append(y_train[i_file][i_window])
+                            n_labels += 1
+                unique, counts = np.unique(all_y, return_counts=True)
+                classes_probs = dict(zip(unique, counts / n_labels))
+
+                # Create a copy of all training samples.
+                import copy
+                X_augmented = copy.deepcopy(X_train)
+                y_augmented = copy.deepcopy(y_train)
+
+                for i_file in range(len(X_train)):
+                    during_event = False
+                    discard_event = False
+                    for i_window in range(len(X_train[i_file])):
+                        window_label = y_train[i_file][i_window]
+                        
+                        if window_label == 'no-event':
+                            during_event = False
+                            discard_event = False
+                        elif not during_event and window_label not in ['no-event',
+                                                                       'bite',
+                                                                       'rumination-chew']:
+                            during_event = True
+                            # If the windows correspond to a selected event to discard
+                            # from a majority class, select it to make zero values and 'no-event'.
+                            if np.random.rand() <= classes_probs[window_label] * 2:
+                                discard_event = True
+
+                        if during_event and discard_event:
+                            for i_channel in range(len(X_train[i_file][i_window])):
+                                window_len = len(X_augmented[i_file][i_window][i_channel])
+                                X_augmented[i_file][i_window][i_channel] = np.zeros(window_len)
+                                y_augmented[i_file][i_window] = 'no-event'
+                        else:
+                            for i_channel in range(len(X_train[i_file][i_window])):
+                                if i_channel == 0:
+                                    sample_rate = 6000
+                                else:
+                                    sample_rate = 100
+
+                                window = X_augmented[i_file][i_window][i_channel]
+                                X_augmented[i_file][i_window][i_channel] = \
+                                    functional.add_background_noise(window,
+                                                                    sample_rate,
+                                                                    snr_level_db=20)[0]
+                logger.info('Applying data augmentation !')
+                logger.info(len(X_train))
+                X_train.extend(X_augmented)
+                y_train.extend(y_augmented)
+                logger.info(len(X_train))
+
+            # Create label encoder and fit with unique values.
+            self.target_encoder = LabelEncoder()
+
+            unique_labels = np.unique(np.hstack(y_train))
+            self.target_encoder.fit(unique_labels)
+            if self.manage_sequences:
+                y_train_enc = []
+                for file_labels in y_train:
+                    y_train_enc.append(self.target_encoder.transform(file_labels))
+            else:
+                y_train_enc = self.target_encoder.transform(y_train)
+
+            model_instance = self.model_factory(parameters_combination)
+            self.model = model_instance
+            self.set_model_output_path(ix_fold, is_grid_search)
+
+            # Fit model and get predictions.
+            funnel = Funnel(self.features_factory,
+                            model_instance,
+                            self.audio_sampling_frequency,
+                            self.movement_sampling_frequency,
+                            self.use_raw_data)
+            funnel.fit(X_train, y_train_enc)
+
+            if self.quantization:
+                for ix_layer, layer in enumerate(funnel.model.model.layers):
+                    w = layer.get_weights()
+                    w = [i.astype(self.quantization) for i in w]
+                    funnel.model.model.layers[ix_layer].set_weights(w)
+                logger.info('quantization applied correctly !', str(self.quantization))
+
+            for test_signal_key in test_fold_keys:
+                if self.manage_sequences:
+                    X_test = [self.X[test_signal_key]]
+                else:
+                    X_test = self.X[test_signal_key]
+
+                y_signal_pred = funnel.predict(X_test)
+
+                if self.manage_sequences:
+                    y_signal_pred = y_signal_pred[0]
+
+                y_signal_pred_labels = self.target_encoder.inverse_transform(y_signal_pred)
+
+                y_test = self.y[test_signal_key]
+                signal_predictions[test_signal_key] = [y_test, y_signal_pred_labels]
+
+        logger.info('-' * 25)
+        logger.info('Fold iterations finished !. Starting evaluation phase.')
+
+        # Save predictions.
+        self.save_predictions(signal_predictions)
+
+        unique_labels = np.concatenate([self.y[k] for k in self.y.keys()])
+        unique_labels = list(set(unique_labels))
+
+        if self.no_event_class in unique_labels:
+            unique_labels.remove(self.no_event_class)
+
+        if is_grid_search:
+            fold_metrics = self.evaluate(unique_labels=unique_labels,
+                                         folds=folds,
+                                         verbose=False)
+        else:
+            # Log general information about experiment result.
+            logger.info('-' * 50)
+            logger.info('***** Classification results *****')
+            fold_metrics = self.evaluate(unique_labels=unique_labels,
+                                         folds=folds,
+                                         verbose=True)
+
+        return fold_metrics
+
+    def save_predictions(self,
+                         fold_labels_predictions):
+        ''' Save predictions to disk processing windows and labels. '''
+        df = pd.DataFrame(columns=['segment', 'y_true', 'y_pred'])
+
+        for segment in fold_labels_predictions.keys():
+            y_true = fold_labels_predictions[segment][0]
+            y_pred = fold_labels_predictions[segment][1]
+
+            _df = pd.DataFrame({
+                'y_true': y_true,
+                'y_pred': y_pred
+            })
+            _df['segment'] = segment
+            df = pd.concat([df, _df])
+
+            # Transform windows to events and save.
+            df_labels = windows2events(y_true,
+                                       self.window_width,
+                                       self.window_overlap)
+            # Remove no-event class.
+            df_labels = df_labels[df_labels.label != self.no_event_class]
+            df_labels.to_csv(os.path.join(self.path, segment + '_true.txt'),
+                             sep='\t',
+                             header=False,
+                             index=False)
+
+            df_predictions = windows2events(y_pred,
+                                            self.window_width,
+                                            self.window_overlap)
+            # Remove no-event class.
+            df_predictions = df_predictions[df_predictions.label != self.no_event_class]
+            df_predictions.to_csv(os.path.join(self.path, segment + '_pred.txt'),
+                                  sep='\t',
+                                  header=False,
+                                  index=False)
+
+        df.to_csv(os.path.join(self.path, 'fold_labels_and_predictions.csv'))
+
+    def evaluate(self, unique_labels, folds, verbose=True):
+        target_files = glob(os.path.join(self.path, 'segment_*_true.txt'))
+        final_metric = 'f_measure'
+
+        # Dictionary used to save selected metric per fold.
+        fold_metrics_detail = {}
+        fold_metrics = []
+
+        for ix_fold, fold in folds.items():
+            file_list = []
+            fold_files = [f for f
+                          in target_files if int(os.path.basename(f).split('_')[1]) in fold]
+            for file in fold_files:
+                pred_file = file.replace('true', 'pred')
+                file_list.append({
+                    'reference_file': file,
+                    'estimated_file': pred_file
+                })
+
+            data = []
+
+            # Get used event labels
+            all_data = dcase_util.containers.MetaDataContainer()
+            for file_pair in file_list:
+                reference_event_list = sed_eval.io.load_event_list(
+                    filename=file_pair['reference_file']
+                )
+                estimated_event_list = sed_eval.io.load_event_list(
+                    filename=file_pair['estimated_file']
+                )
+
+                data.append({'reference_event_list': reference_event_list,
+                             'estimated_event_list': estimated_event_list})
+
+                all_data += reference_event_list
+
+            # Create metrics classes, define parameters
+            segment_based_metrics = sed_eval.sound_event.SegmentBasedMetrics(
+                event_label_list=unique_labels,
+                time_resolution=settings.segment_width_value
+            )
+
+            event_based_metrics = sed_eval.sound_event.EventBasedMetrics(
+                event_label_list=unique_labels,
+                t_collar=settings.collar_value
+            )
+
+            # Go through files
+            for file_pair in data:
+                segment_based_metrics.evaluate(
+                    reference_event_list=file_pair['reference_event_list'],
+                    estimated_event_list=file_pair['estimated_event_list']
+                )
+
+                event_based_metrics.evaluate(
+                    reference_event_list=file_pair['reference_event_list'],
+                    estimated_event_list=file_pair['estimated_event_list']
+                )
+
+            # Dump metrics objects in order to facilitate comparision and reports generation.
+            metrics = {
+                'segment_based_metrics': segment_based_metrics,
+                'event_based_metrics': event_based_metrics
+            }
+
+            dump_file_name = f'experiment_metrics_fold_{ix_fold}.pkl'
+            with open(os.path.join(self.path, dump_file_name), 'wb') as handle:
+                pickle.dump(metrics, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+            segment_metrics = segment_based_metrics.results_overall_metrics()
+            event_metrics = event_based_metrics.results_overall_metrics()
+
+            if verbose:
+                logger.info('### Segment based metrics (fold %s) ###', ix_fold)
+                logger.info(segment_based_metrics)
+                logger.info('')
+                logger.info('### Event based metrics (fold %s) ###', ix_fold)
+                logger.info(event_based_metrics)
+                logger.info('-' * 20)
+
+            fold_metrics_detail[ix_fold] = {
+                'event_score': event_metrics[final_metric],
+                'segment_score': segment_metrics[final_metric]
+            }
+            fold_metrics.append(event_metrics[final_metric][final_metric])
+
+        dump_file_name = 'experiment_overall_metrics.pkl'
+        with open(os.path.join(self.path, dump_file_name), 'wb') as handle:
+            pickle.dump(fold_metrics_detail, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+        folds_mean = np.round(np.mean(fold_metrics), 6)
+        folds_std = np.round(np.std(fold_metrics), 6)
+
+        if verbose:
+            logger.info('### Event based overall metrics ###')
+            logger.info('F1 score (micro) mean for events: %s', str(folds_mean))
+            logger.info('F1 score (micro) standard deviation for events: %s', str(folds_std))
+            logger.info('-' * 20)
+
+        return folds_mean
+
+    def set_model_output_path(self, n_fold, is_grid_search=False):
+        output_logs_path = os.path.join(self.path, f'logs_fold_{n_fold}')
+        output_model_checkpoint_path = os.path.join(self.path, f'model_checkpoints_fold_{n_fold}')
+
+        # Skip validation of directory existance during grid search.
+        if not is_grid_search:
+            # Check if paths already exists
+            if os.path.exists(output_logs_path):
+                assert not os.path.exists(output_logs_path), 'Model output logs path already exists!'
+
+            if os.path.exists(output_model_checkpoint_path):
+                assert not os.path.exists(output_model_checkpoint_path), \
+                    'Model output checkpoints path already exists!'
+
+        # If not, create and save into model instance.
+        os.makedirs(output_logs_path)
+        self.model.output_logs_path = output_logs_path
+
+        os.makedirs(output_model_checkpoint_path)
+        self.model.output_path_model_checkpoints = output_model_checkpoint_path
+
+
+class Funnel:
+    ''' A similar interface to sklearn Pipeline, but transformations are applied in parallel. '''
+    def __init__(self,
+                 features_factory,
+                 model_instance,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency,
+                 use_raw_data=False):
+        self.features = features_factory(
+            audio_sampling_frequency,
+            movement_sampling_frequency).features
+        self.model = model_instance
+        self.use_raw_data = use_raw_data
+
+    def fit(self, X, y):
+        # Fit features and transform data.
+        X_features = []
+
+        for feature in self.features:
+            logger.info(f'Processing the feature {feature.feature.__class__.__name__}.')
+            X_features.append(feature.fit_transform(X, y))
+
+        if not self.use_raw_data:
+            X_features = np.concatenate(X_features, axis=1)
+
+        # Fit model.
+        logger.info('Training model ...')
+        self.model.fit(X_features, y)
+
+    def predict(self, X):
+        # Transform data using previously fitted features.
+        X_features = []
+
+        for feature in self.features:
+            X_features.append(feature.transform(X))
+
+        if not self.use_raw_data:
+            X_features = np.concatenate(X_features, axis=1)
+
+        # Get model predictions with transformed data.
+        return self.model.predict(X_features)
+\nFile: ./src/chewbite_fusion/experiments/deep_sound.py
+import logging
+
+from chewbite_fusion.models.deep_sound import DeepSound
+from chewbite_fusion.experiments.settings import random_seed
+from chewbite_fusion.data.make_dataset import main
+from chewbite_fusion.experiments.base import Experiment
+from chewbite_fusion.features.feature_factories import FeatureFactory_RawAudioData
+
+from yaer.base import experiment
+
+
+logger = logging.getLogger('yaer')
+
+
+def get_model_instance(variable_params):
+    return DeepSound(input_size=1800,
+                     output_size=6,
+                     n_epochs=1500,
+                     batch_size=10,
+                     training_reshape=True,
+                     set_sample_weights=True,
+                     feature_scaling=True)
+
+
+@experiment()
+def deep_sound():
+    """ Experiment with Deep Sound architecture.
+    """
+    window_width = 0.3
+    window_overlap = 0.5
+    X, y = main(window_width=window_width,
+                window_overlap=window_overlap,
+                include_movement_magnitudes=True,
+                audio_sampling_frequency=6000)
+
+    e = Experiment(get_model_instance,
+                   FeatureFactory_RawAudioData,
+                   X, y,
+                   window_width=window_width,
+                   window_overlap=window_overlap,
+                   name='deep_sound',
+                   manage_sequences=True,
+                   use_raw_data=True)
+
+    e.run()
+\nFile: ./src/chewbite_fusion/features/audio_raw_data.py
+import numpy as np
+
+from chewbite_fusion.features.base import BaseFeature
+
+
+class AudioRawData(BaseFeature):
+    def transform(self, X, y=None):
+        raw_audio = []
+
+        for file in X:
+            raw_audio.append([list(window[0]) for window in file])
+
+        return raw_audio
+\nFile: ./src/chewbite_fusion/features/.ipynb_checkpoints/audio_raw_data-checkpoint.py
+import numpy as np
+
+from chewbite_fusion.features.base import BaseFeature
+
+
+class AudioRawData(BaseFeature):
+    def transform(self, X, y=None):
+        raw_audio = []
+
+        for file in X:
+            raw_audio.append([list(window[0]) for window in file])
+
+        return raw_audio
+\nFile: ./src/chewbite_fusion/features/.ipynb_checkpoints/base-checkpoint.py
+class BaseFeatureBuilder():
+    def __init__(self,
+                 feature,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency,
+                 preprocessing=None):
+        self.feature = feature(audio_sampling_frequency,
+                               movement_sampling_frequency)
+        if preprocessing:
+            self.preprocessing = preprocessing()
+        else:
+            self.preprocessing = None
+
+    def fit(self, X, y=None):
+        if self.preprocessing:
+            self.preprocessing.fit(X, y)
+
+    def transform(self, X, y=None):
+        X_tfd = self.feature.transform(X, y)
+
+        if self.preprocessing:
+            X_sld = self.preprocessing.transform(X_tfd, y)
+        else:
+            X_sld = X_tfd
+
+        return X_sld
+
+    def fit_transform(self, X, y=None):
+        X_tfd = self.feature.transform(X, y)
+
+        if self.preprocessing:
+            X_sld = self.preprocessing.fit_transform(X_tfd, y)
+        else:
+            X_sld = X_tfd
+
+        return X_sld
+
+
+class BaseFeature():
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        self.audio_sampling_frequency = audio_sampling_frequency
+        self.movement_sampling_frequency = movement_sampling_frequency
+\nFile: ./src/chewbite_fusion/features/.ipynb_checkpoints/feature_factories-checkpoint.py
+from sklearn.preprocessing import StandardScaler
+
+from chewbite_fusion.features.base import BaseFeatureBuilder
+from chewbite_fusion.features import imu_statistical_based_features as sbf
+from chewbite_fusion.features import imu_statistical_based_features_seq as sbfs
+from chewbite_fusion.features import audio_spectral_based_features as aspf
+from chewbite_fusion.features import audio_statistical_based_features as asf
+from chewbite_fusion.features import audio_cbia_based_features as cbia
+from chewbite_fusion.features import audio_cbia_based_features_seq as cbia_seq
+from chewbite_fusion.features import audio_raw_data as ard
+from chewbite_fusion.features import imu_raw_data as ird
+from chewbite_fusion.features import imu_raw_data_no_sequences as irdns
+from chewbite_fusion.features import imu_diff as id
+
+
+class BaseFeatureFactory():
+    def __init__(self, features,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        self.features = []
+        for feature in features:
+            self.features.append(BaseFeatureBuilder(
+                feature,
+                audio_sampling_frequency,
+                movement_sampling_frequency,
+                StandardScaler
+            ))
+
+
+class BaseFeatureFactoryNoPreprocessing():
+    def __init__(self, features,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        self.features = []
+        for feature in features:
+            self.features.append(BaseFeatureBuilder(
+                feature,
+                audio_sampling_frequency,
+                movement_sampling_frequency,
+                None
+            ))
+
+
+class FeatureFactory_v1(BaseFeatureFactory):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            sbf.MovementSignalAccAverage,
+            sbf.MovementSignalGyrAverage,
+            sbf.MovementSignalMagAverage,
+            sbf.MovementSignalAccStandardDeviation,
+            sbf.MovementSignalGyrStandardDeviation,
+            sbf.MovementSignalMagStandardDeviation,
+            sbf.MovementSignalAccMax,
+            sbf.MovementSignalGyrMax,
+            sbf.MovementSignalMagMax,
+            sbf.MovementSignalAccMin,
+            sbf.MovementSignalGyrMin,
+            sbf.MovementSignalMagMin
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_Alvarenga2019(BaseFeatureFactory):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            sbf.MovementSignalAccAverage,
+            sbf.MovementSignalAccStandardDeviation,
+            sbf.MovementSignalAccMin,
+            sbf.MovementSignalAccMax,
+            sbf.MovementSignalAccAreaStats,
+            sbf.MovementSignalAccMagnitudeStats,
+            sbf.MovementSignalAccVariation,
+            sbf.MovementSignalAccEnergyStats,
+            sbf.MovementSignalAccEntropyStats,
+            sbf.MovementSignalAccPitchStats,
+            sbf.MovementSignalAccRollStats,
+            sbf.MovementSignalAccInclinationStats
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_v2(BaseFeatureFactory):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            asf.AudioSignalAverage,
+            asf.AudioSignalEnergy,
+            asf.AudioSignalKurtosis,
+            asf.AudioSignalMax,
+            asf.AudioSignalMin,
+            asf.AudioSignalStandardDeviation,
+            asf.AudioSignalSum,
+            asf.AudioSignalZeroCrossing,
+            aspf.AudioSpectralCentroid
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_v3(BaseFeatureFactory):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            sbf.MovementSignalAccAverage,
+            sbf.MovementSignalAccAreaStats,
+            sbf.MovementSignalAccEnergyStats,
+            sbf.MovementSignalAccEntropyStats,
+            sbf.MovementSignalAccInclinationStats,
+            sbf.MovementSignalAccMagnitudeStats,
+            sbf.MovementSignalAccMax,
+            sbf.MovementSignalAccMin,
+            sbf.MovementSignalGyrAverage,
+            sbf.MovementSignalGyrMax,
+            sbf.MovementSignalGyrMin,
+            sbf.MovementSignalGyrStandardDeviation,
+            asf.AudioSignalAverage,
+            asf.AudioSignalEnergy,
+            asf.AudioSignalKurtosis,
+            asf.AudioSignalMax,
+            asf.AudioSignalMin,
+            asf.AudioSignalStandardDeviation,
+            asf.AudioSignalSum,
+            asf.AudioSignalZeroCrossing,
+            aspf.AudioSpectralCentroid
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_v4(BaseFeatureFactory):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            asf.AudioSignalAverage,
+            asf.AudioSignalEnergy,
+            asf.AudioSignalKurtosis,
+            asf.AudioSignalMax,
+            asf.AudioSignalMin,
+            asf.AudioSignalStandardDeviation,
+            asf.AudioSignalSum,
+            asf.AudioSignalZeroCrossing,
+            aspf.AudioSpectralCentroid,
+            cbia.CBIAFeatures
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_v5(BaseFeatureFactory):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            sbf.MovementSignalAccAreaStats,
+            sbf.MovementSignalGyrAreaStats,
+            sbf.MovementSignalAccMagnitudeStats,
+            sbf.MovementSignalGyrMagnitudeStats,
+            sbf.MovementSignalAccVariation,
+            sbf.MovementSignalGyrVariation,
+            sbf.MovementSignalAccEnergyStats,
+            sbf.MovementSignalGyrEnergyStats,
+            sbf.MovementSignalAccEntropyStats,
+            sbf.MovementSignalGyrEntropyStats,
+            sbf.MovementSignalAccPitchStats,
+            sbf.MovementSignalAccRollStats,
+            sbf.MovementSignalAccInclinationStats,
+            cbia.CBIAFeatures
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_RawAudioData(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            ard.AudioRawData
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_RawIMUData(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            ird.AccXRawData,
+            ird.AccYRawData,
+            ird.AccZRawData,
+            ird.GyrXRawData,
+            ird.GyrYRawData,
+            ird.GyrZRawData,
+            ird.MagXRawData,
+            ird.MagYRawData,
+            ird.MagZRawData
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_RawIMUDataNoSequences(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            irdns.AccXRawData,
+            irdns.AccYRawData,
+            irdns.AccZRawData,
+            irdns.GyrXRawData,
+            irdns.GyrYRawData,
+            irdns.GyrZRawData,
+            irdns.MagXRawData,
+            irdns.MagYRawData,
+            irdns.MagZRawData
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_RawIMUNoMagDataNoSequences(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            irdns.AccXRawData,
+            irdns.AccYRawData,
+            irdns.AccZRawData,
+            irdns.GyrXRawData,
+            irdns.GyrYRawData,
+            irdns.GyrZRawData
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_RawAccDataNoSequences(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            irdns.AccXRawData,
+            irdns.AccYRawData,
+            irdns.AccZRawData
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_IMUMagnitudesNoSequences(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            irdns.AccMagnitudeVector,
+            irdns.GyrMagnitudeVector,
+            irdns.MagMagnitudeVector
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_IMUMagnitudesNoMagNoSequences(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            irdns.AccMagnitudeVector,
+            irdns.GyrMagnitudeVector
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_AccMagnitudesNoSequences(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            irdns.AccMagnitudeVector
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_AllRawData(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            ard.AudioRawData,
+            ird.AccXRawData,
+            ird.AccYRawData,
+            ird.AccZRawData,
+            ird.GyrXRawData,
+            ird.GyrYRawData,
+            ird.GyrZRawData,
+            ird.MagXRawData,
+            ird.MagYRawData,
+            ird.MagZRawData
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_AudioAccGyrRawData(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            ard.AudioRawData,
+            ird.AccXRawData,
+            ird.AccYRawData,
+            ird.AccZRawData,
+            ird.GyrXRawData,
+            ird.GyrYRawData,
+            ird.GyrZRawData
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_AudioAccGyrVectorsRawData(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            ard.AudioRawData,
+            ird.AccMagnitudeVector,
+            ird.GyrMagnitudeVector
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_AudioAccGyrDiffVectorsRawData(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            ard.AudioRawData,
+            id.AccMagnitudeDiffVector,
+            id.GyrMagnitudeDiffVector
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_DecisionLevelMixData(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            ard.AudioRawData,
+            sbfs.MovementSignalAccAverage,
+            sbfs.MovementSignalAccStandardDeviation,
+            sbfs.MovementSignalAccMin,
+            sbfs.MovementSignalAccMax,
+            sbfs.MovementSignalAccAreaStats,
+            sbfs.MovementSignalAccMagnitudeStats,
+            sbfs.MovementSignalAccVariation,
+            sbfs.MovementSignalAccEnergyStats,
+            sbfs.MovementSignalAccEntropyStats,
+            sbfs.MovementSignalAccPitchStats,
+            sbfs.MovementSignalAccRollStats,
+            sbfs.MovementSignalAccInclinationStats
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_DecisionLevelMixData_v2(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            ard.AudioRawData,
+            cbia_seq.CBIAFeatures,
+            ird.AccXRawData,
+            ird.AccYRawData,
+            ird.AccZRawData,
+            ird.GyrXRawData,
+            ird.GyrYRawData,
+            ird.GyrZRawData,
+            ird.MagXRawData,
+            ird.MagYRawData,
+            ird.MagZRawData,
+            sbfs.MovementSignalAccAverage,
+            sbfs.MovementSignalAccStandardDeviation,
+            sbfs.MovementSignalAccMin,
+            sbfs.MovementSignalAccMax,
+            sbfs.MovementSignalAccAreaStats,
+            sbfs.MovementSignalAccMagnitudeStats,
+            sbfs.MovementSignalAccVariation,
+            sbfs.MovementSignalAccEnergyStats,
+            sbfs.MovementSignalAccEntropyStats,
+            sbfs.MovementSignalAccPitchStats,
+            sbfs.MovementSignalAccRollStats,
+            sbfs.MovementSignalAccInclinationStats
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_AudioAccRawData(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            ard.AudioRawData,
+            ird.AccXRawData,
+            ird.AccYRawData,
+            ird.AccZRawData
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+\nFile: ./src/chewbite_fusion/features/__init__.py
+\nFile: ./src/chewbite_fusion/features/base.py
+class BaseFeatureBuilder():
+    def __init__(self,
+                 feature,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency,
+                 preprocessing=None):
+        self.feature = feature(audio_sampling_frequency,
+                               movement_sampling_frequency)
+        if preprocessing:
+            self.preprocessing = preprocessing()
+        else:
+            self.preprocessing = None
+
+    def fit(self, X, y=None):
+        if self.preprocessing:
+            self.preprocessing.fit(X, y)
+
+    def transform(self, X, y=None):
+        X_tfd = self.feature.transform(X, y)
+
+        if self.preprocessing:
+            X_sld = self.preprocessing.transform(X_tfd, y)
+        else:
+            X_sld = X_tfd
+
+        return X_sld
+
+    def fit_transform(self, X, y=None):
+        X_tfd = self.feature.transform(X, y)
+
+        if self.preprocessing:
+            X_sld = self.preprocessing.fit_transform(X_tfd, y)
+        else:
+            X_sld = X_tfd
+
+        return X_sld
+
+
+class BaseFeature():
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        self.audio_sampling_frequency = audio_sampling_frequency
+        self.movement_sampling_frequency = movement_sampling_frequency
+\nFile: ./src/chewbite_fusion/features/feature_factories.py
+from sklearn.preprocessing import StandardScaler
+
+from chewbite_fusion.features.base import BaseFeatureBuilder
+from chewbite_fusion.features import imu_statistical_based_features as sbf
+from chewbite_fusion.features import imu_statistical_based_features_seq as sbfs
+from chewbite_fusion.features import audio_spectral_based_features as aspf
+from chewbite_fusion.features import audio_statistical_based_features as asf
+from chewbite_fusion.features import audio_cbia_based_features as cbia
+from chewbite_fusion.features import audio_cbia_based_features_seq as cbia_seq
+from chewbite_fusion.features import audio_raw_data as ard
+from chewbite_fusion.features import imu_raw_data as ird
+from chewbite_fusion.features import imu_raw_data_no_sequences as irdns
+from chewbite_fusion.features import imu_diff as id
+
+
+class BaseFeatureFactory():
+    def __init__(self, features,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        self.features = []
+        for feature in features:
+            self.features.append(BaseFeatureBuilder(
+                feature,
+                audio_sampling_frequency,
+                movement_sampling_frequency,
+                StandardScaler
+            ))
+
+
+class BaseFeatureFactoryNoPreprocessing():
+    def __init__(self, features,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        self.features = []
+        for feature in features:
+            self.features.append(BaseFeatureBuilder(
+                feature,
+                audio_sampling_frequency,
+                movement_sampling_frequency,
+                None
+            ))
+
+
+class FeatureFactory_v1(BaseFeatureFactory):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            sbf.MovementSignalAccAverage,
+            sbf.MovementSignalGyrAverage,
+            sbf.MovementSignalMagAverage,
+            sbf.MovementSignalAccStandardDeviation,
+            sbf.MovementSignalGyrStandardDeviation,
+            sbf.MovementSignalMagStandardDeviation,
+            sbf.MovementSignalAccMax,
+            sbf.MovementSignalGyrMax,
+            sbf.MovementSignalMagMax,
+            sbf.MovementSignalAccMin,
+            sbf.MovementSignalGyrMin,
+            sbf.MovementSignalMagMin
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_Alvarenga2019(BaseFeatureFactory):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            sbf.MovementSignalAccAverage,
+            sbf.MovementSignalAccStandardDeviation,
+            sbf.MovementSignalAccMin,
+            sbf.MovementSignalAccMax,
+            sbf.MovementSignalAccAreaStats,
+            sbf.MovementSignalAccMagnitudeStats,
+            sbf.MovementSignalAccVariation,
+            sbf.MovementSignalAccEnergyStats,
+            sbf.MovementSignalAccEntropyStats,
+            sbf.MovementSignalAccPitchStats,
+            sbf.MovementSignalAccRollStats,
+            sbf.MovementSignalAccInclinationStats
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_v2(BaseFeatureFactory):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            asf.AudioSignalAverage,
+            asf.AudioSignalEnergy,
+            asf.AudioSignalKurtosis,
+            asf.AudioSignalMax,
+            asf.AudioSignalMin,
+            asf.AudioSignalStandardDeviation,
+            asf.AudioSignalSum,
+            asf.AudioSignalZeroCrossing,
+            aspf.AudioSpectralCentroid
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_v3(BaseFeatureFactory):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            sbf.MovementSignalAccAverage,
+            sbf.MovementSignalAccAreaStats,
+            sbf.MovementSignalAccEnergyStats,
+            sbf.MovementSignalAccEntropyStats,
+            sbf.MovementSignalAccInclinationStats,
+            sbf.MovementSignalAccMagnitudeStats,
+            sbf.MovementSignalAccMax,
+            sbf.MovementSignalAccMin,
+            sbf.MovementSignalGyrAverage,
+            sbf.MovementSignalGyrMax,
+            sbf.MovementSignalGyrMin,
+            sbf.MovementSignalGyrStandardDeviation,
+            asf.AudioSignalAverage,
+            asf.AudioSignalEnergy,
+            asf.AudioSignalKurtosis,
+            asf.AudioSignalMax,
+            asf.AudioSignalMin,
+            asf.AudioSignalStandardDeviation,
+            asf.AudioSignalSum,
+            asf.AudioSignalZeroCrossing,
+            aspf.AudioSpectralCentroid
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_v4(BaseFeatureFactory):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            asf.AudioSignalAverage,
+            asf.AudioSignalEnergy,
+            asf.AudioSignalKurtosis,
+            asf.AudioSignalMax,
+            asf.AudioSignalMin,
+            asf.AudioSignalStandardDeviation,
+            asf.AudioSignalSum,
+            asf.AudioSignalZeroCrossing,
+            aspf.AudioSpectralCentroid,
+            cbia.CBIAFeatures
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_v5(BaseFeatureFactory):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            sbf.MovementSignalAccAreaStats,
+            sbf.MovementSignalGyrAreaStats,
+            sbf.MovementSignalAccMagnitudeStats,
+            sbf.MovementSignalGyrMagnitudeStats,
+            sbf.MovementSignalAccVariation,
+            sbf.MovementSignalGyrVariation,
+            sbf.MovementSignalAccEnergyStats,
+            sbf.MovementSignalGyrEnergyStats,
+            sbf.MovementSignalAccEntropyStats,
+            sbf.MovementSignalGyrEntropyStats,
+            sbf.MovementSignalAccPitchStats,
+            sbf.MovementSignalAccRollStats,
+            sbf.MovementSignalAccInclinationStats,
+            cbia.CBIAFeatures
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_RawAudioData(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            ard.AudioRawData
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_RawIMUData(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            ird.AccXRawData,
+            ird.AccYRawData,
+            ird.AccZRawData,
+            ird.GyrXRawData,
+            ird.GyrYRawData,
+            ird.GyrZRawData,
+            ird.MagXRawData,
+            ird.MagYRawData,
+            ird.MagZRawData
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_RawIMUDataNoSequences(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            irdns.AccXRawData,
+            irdns.AccYRawData,
+            irdns.AccZRawData,
+            irdns.GyrXRawData,
+            irdns.GyrYRawData,
+            irdns.GyrZRawData,
+            irdns.MagXRawData,
+            irdns.MagYRawData,
+            irdns.MagZRawData
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_RawIMUNoMagDataNoSequences(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            irdns.AccXRawData,
+            irdns.AccYRawData,
+            irdns.AccZRawData,
+            irdns.GyrXRawData,
+            irdns.GyrYRawData,
+            irdns.GyrZRawData
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_RawAccDataNoSequences(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            irdns.AccXRawData,
+            irdns.AccYRawData,
+            irdns.AccZRawData
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_IMUMagnitudesNoSequences(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            irdns.AccMagnitudeVector,
+            irdns.GyrMagnitudeVector,
+            irdns.MagMagnitudeVector
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_IMUMagnitudesNoMagNoSequences(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            irdns.AccMagnitudeVector,
+            irdns.GyrMagnitudeVector
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_AccMagnitudesNoSequences(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            irdns.AccMagnitudeVector
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_AllRawData(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            ard.AudioRawData,
+            ird.AccXRawData,
+            ird.AccYRawData,
+            ird.AccZRawData,
+            ird.GyrXRawData,
+            ird.GyrYRawData,
+            ird.GyrZRawData,
+            ird.MagXRawData,
+            ird.MagYRawData,
+            ird.MagZRawData
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_AudioAccGyrRawData(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            ard.AudioRawData,
+            ird.AccXRawData,
+            ird.AccYRawData,
+            ird.AccZRawData,
+            ird.GyrXRawData,
+            ird.GyrYRawData,
+            ird.GyrZRawData
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_AudioAccGyrVectorsRawData(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            ard.AudioRawData,
+            ird.AccMagnitudeVector,
+            ird.GyrMagnitudeVector
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_AudioAccGyrDiffVectorsRawData(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            ard.AudioRawData,
+            id.AccMagnitudeDiffVector,
+            id.GyrMagnitudeDiffVector
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_DecisionLevelMixData(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            ard.AudioRawData,
+            sbfs.MovementSignalAccAverage,
+            sbfs.MovementSignalAccStandardDeviation,
+            sbfs.MovementSignalAccMin,
+            sbfs.MovementSignalAccMax,
+            sbfs.MovementSignalAccAreaStats,
+            sbfs.MovementSignalAccMagnitudeStats,
+            sbfs.MovementSignalAccVariation,
+            sbfs.MovementSignalAccEnergyStats,
+            sbfs.MovementSignalAccEntropyStats,
+            sbfs.MovementSignalAccPitchStats,
+            sbfs.MovementSignalAccRollStats,
+            sbfs.MovementSignalAccInclinationStats
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_DecisionLevelMixData_v2(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            ard.AudioRawData,
+            cbia_seq.CBIAFeatures,
+            ird.AccXRawData,
+            ird.AccYRawData,
+            ird.AccZRawData,
+            ird.GyrXRawData,
+            ird.GyrYRawData,
+            ird.GyrZRawData,
+            ird.MagXRawData,
+            ird.MagYRawData,
+            ird.MagZRawData,
+            sbfs.MovementSignalAccAverage,
+            sbfs.MovementSignalAccStandardDeviation,
+            sbfs.MovementSignalAccMin,
+            sbfs.MovementSignalAccMax,
+            sbfs.MovementSignalAccAreaStats,
+            sbfs.MovementSignalAccMagnitudeStats,
+            sbfs.MovementSignalAccVariation,
+            sbfs.MovementSignalAccEnergyStats,
+            sbfs.MovementSignalAccEntropyStats,
+            sbfs.MovementSignalAccPitchStats,
+            sbfs.MovementSignalAccRollStats,
+            sbfs.MovementSignalAccInclinationStats
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+
+
+class FeatureFactory_AudioAccRawData(BaseFeatureFactoryNoPreprocessing):
+    def __init__(self,
+                 audio_sampling_frequency,
+                 movement_sampling_frequency):
+        features = [
+            ard.AudioRawData,
+            ird.AccXRawData,
+            ird.AccYRawData,
+            ird.AccZRawData
+        ]
+        super().__init__(features,
+                         audio_sampling_frequency,
+                         movement_sampling_frequency)
+\nFile: ./src/__init__.py
+\nFile: ./setup.py
+from setuptools import find_packages, setup
+
+setup(
+    name='chewbite_fusion',
+    packages=['chewbite_fusion'],
+    package_dir={'': 'src'},
+    version='0.1.0',
+    description='Audio and movement events detection.',
+    author='sinc(i)',
+    license='MIT',
+    install_requires=[
+        'pandas==1.5.3',
+        'plotly==5.14.0',
+        'scipy==1.10.1',
+        'notebook==6.5.3',
+        'scikit-learn==1.2.2',
+        'librosa==0.10.0',
+        'more_itertools==9.1.0',
+        'yaer @ git+https://github.com/arielrossanigo/yaer.git#egg=yaer',
+        'tensorflow==2.12.0',
+        'sed_eval==0.2.1',
+        'xgboost==1.7.5',
+        'seaborn==0.12.2'
+    ]
+)
