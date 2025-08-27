@@ -14,7 +14,7 @@ logger = logging.getLogger('yaer')
 
 def get_model_instance(variable_params):
     return DeepSound(input_size=1800,
-                     output_size=6,
+                     output_size=4,
                      n_epochs=1500,
                      batch_size=10,
                      training_reshape=True,
@@ -30,7 +30,7 @@ def deep_sound():
     window_overlap = 0.5
     X, y = main(window_width=window_width,
                 window_overlap=window_overlap,
-                include_movement_magnitudes=True,
+                include_movement_magnitudes=False,
                 audio_sampling_frequency=6000)
 
     e = Experiment(get_model_instance,

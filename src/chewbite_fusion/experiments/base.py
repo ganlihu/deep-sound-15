@@ -185,7 +185,7 @@ class Experiment:
                             discard_event = False
                         elif not during_event and window_label not in ['no-event',
                                                                        'bite',
-                                                                       'rumination-chew']:
+                                                                       'chewbite']:
                             during_event = True
                             # If the windows correspond to a selected event to discard
                             # from a majority class, select it to make zero values and 'no-event'.

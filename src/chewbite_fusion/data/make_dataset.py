@@ -214,12 +214,12 @@ def main(data_source_names=['zavalla2022'],
                 sep='\t',
                 names=["start", "end", "jm_event"])
 
-            general_mask = df_segment_labels.jm_event
-            df_segment_labels.loc[general_mask == 'u', 'jm_event'] = 'unknown'
-            df_segment_labels.loc[general_mask == 'b', 'jm_event'] = 'bite'
-            df_segment_labels.loc[general_mask == 'c', 'jm_event'] = 'grazing-chew'
-            df_segment_labels.loc[general_mask == 'r', 'jm_event'] = 'rumination-chew'
-            df_segment_labels.loc[general_mask == 'x', 'jm_event'] = 'chewbite'
+            # general_mask = df_segment_labels.jm_event
+            # df_segment_labels.loc[general_mask == 'u', 'jm_event'] = 'unknown'
+            # df_segment_labels.loc[general_mask == 'b', 'jm_event'] = 'bite'
+            # df_segment_labels.loc[general_mask == 'c', 'jm_event'] = 'grazing-chew'
+            # df_segment_labels.loc[general_mask == 'r', 'jm_event'] = 'rumination-chew'
+            # df_segment_labels.loc[general_mask == 'x', 'jm_event'] = 'chewbite'
 
             # Get windows from signals.
             audio_windows = get_windows_from_audio_signal(
@@ -448,7 +448,8 @@ def get_windows_labels(
         window_start = window_start + window_width * (1 - window_overlap)
         window_end = window_start + window_width
 
-    not_used_labels = labels[(labels.jm_event != 'u') & (labels.not_used)]
+    # not_used_labels = labels[(labels.jm_event != 'u') & (labels.not_used)]
+    not_used_labels = labels[labels.not_used]
     if len(not_used_labels) > 0:
         logger.info('Some labels have not been used: %s', str(len(not_used_labels)))
     else:
