@@ -25,7 +25,7 @@ def main(data_source_names=['zavalla2022'],
          include_movement_magnitudes=False,
          no_event_class_name='no-event',
          filters=None,
-         invalidate_cache=False):
+         invalidate_cache=True):
     """ Run data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
 

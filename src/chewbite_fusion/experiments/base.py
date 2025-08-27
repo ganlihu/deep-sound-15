@@ -80,11 +80,11 @@ class Experiment:
         # Segment assigment to each fold. This was created using random
         # sampling with stratified separation of rumination segments.
         folds = {
-            '1': [45, 3, 23, 2, 17],
-            '2': [20, 42, 21, 1, 39],
-            '3': [28, 22, 33, 51, 55],
-            '4': [10, 40, 14, 41, 19],
-            '5': [47, 24, 7, 18]
+            '1': [40, 41, 7, 37, 26, 24, 17, 48, 21, 5],
+            '2': [33, 52, 23, 4, 15, 36, 49, 18, 28, 50],
+            '3': [35, 27, 44, 20, 9, 51, 31, 3, 16, 42],
+            '4': [22, 39, 32, 45, 34, 2, 8, 30, 29, 1],
+            '5': [19, 10, 6, 43, 47, 13, 11, 14, 12, 38, 25, 46]
         }
 
         for i in folds.values():

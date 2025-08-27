@@ -32,7 +32,9 @@ def deep_sound():
                 window_overlap=window_overlap,
                 include_movement_magnitudes=False,
                 audio_sampling_frequency=6000)
-
+    # 在此处添加日志，打印片段数量和示例编号
+    logger.info("生成的片段数量: %s", len(X['zavalla2022'].keys()))
+    logger.info("片段编号示例: %s", list(X['zavalla2022'].keys())[:5])
     e = Experiment(get_model_instance,
                    FeatureFactory_RawAudioData,
                    X, y,

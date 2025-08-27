@@ -1,16 +1,11 @@
 from sklearn.preprocessing import StandardScaler
 
 from chewbite_fusion.features.base import BaseFeatureBuilder
-from chewbite_fusion.features import imu_statistical_based_features as sbf
-from chewbite_fusion.features import imu_statistical_based_features_seq as sbfs
 from chewbite_fusion.features import audio_spectral_based_features as aspf
 from chewbite_fusion.features import audio_statistical_based_features as asf
 from chewbite_fusion.features import audio_cbia_based_features as cbia
 from chewbite_fusion.features import audio_cbia_based_features_seq as cbia_seq
 from chewbite_fusion.features import audio_raw_data as ard
-from chewbite_fusion.features import imu_raw_data as ird
-from chewbite_fusion.features import imu_raw_data_no_sequences as irdns
-from chewbite_fusion.features import imu_diff as id
 
 
 class BaseFeatureFactory():
