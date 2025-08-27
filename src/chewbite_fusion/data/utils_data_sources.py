@@ -22,7 +22,8 @@ def list_datasets():
             audio_files_format="wav",
             audio_sampling_frequency=22050,
             imu_sampling_frequency=100,
-            multimodal=True
+            # multimodal=True
+            multimodal=False
         )
     }
 

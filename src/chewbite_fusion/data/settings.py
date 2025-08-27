@@ -1,2 +1,2 @@
-DATA_SOURCES_PATH = ''
-CACHE_DIR = ''
+DATA_SOURCES_PATH = '../../data/raw'
+CACHE_DIR = '../../data/cache'
