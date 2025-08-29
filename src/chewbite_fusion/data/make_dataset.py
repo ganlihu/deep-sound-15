@@ -228,6 +228,15 @@ def main(data_source_names=['zavalla2022'],
                 window_width=window_width,
                 window_overlap=window_overlap)
 
+            
+            # 添加日志：打印音频长度和窗口数量
+            logger.info(f"Segment {segment_name} audio length: {len(audio_signal)/audio_sampling_frequency:.2f}s")
+            logger.info(f"Generated {len(audio_windows)} windows for {segment_name}")
+            
+            
+            
+            
+            
             imu_windows = []
             if dataset_has_movement_data:
                 imu_windows = get_windows_from_imu_signals(

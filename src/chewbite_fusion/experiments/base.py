@@ -77,6 +77,20 @@ class Experiment:
         self.X = self.X['zavalla2022']
         self.y = self.y['zavalla2022']
 
+        
+        
+        # 新增日志：验证每个片段ID的解析是否正确
+        for k in self.X.keys():
+            try:
+                seg_id = int(k.split('_')[1])
+                logger.debug(f'Segment {k} parsed to ID {seg_id}')
+            except:
+                logger.error(f'Failed to parse segment ID from {k}')
+        
+        
+        
+        
+        
         # Segment assigment to each fold. This was created using random
         # sampling with stratified separation of rumination segments.
         folds = {
@@ -90,6 +104,13 @@ class Experiment:
         for i in folds.values():
             self.train_validation_segments.extend(i)
 
+            
+        # 新增日志：打印训练验证片段的数量和具体内容
+        logger.info('train_validation_segments count: %d', len(self.train_validation_segments))
+        logger.info('train_validation_segments: %s', self.train_validation_segments)
+        
+        
+        
         hash_method_instance = hashlib.new('sha256')
         params_results = {}
         full_grid = list(ParameterGrid(self.model_parameters_grid))
@@ -145,6 +166,11 @@ class Experiment:
             train_fold_keys = [k for k in train_fold_keys if \
                 int(k.split('_')[1]) in self.train_validation_segments]
 
+            
+            # 新增日志：打印筛选后的训练片段数量
+            logger.info('Train fold keys count: %d', len(train_fold_keys))
+            
+            
             logger.info('Train fold keys: %s.', str(train_fold_keys))
             X_train = []
             y_train = []
@@ -156,6 +182,20 @@ class Experiment:
                     X_train.extend(self.X[train_signal_key])
                     y_train.extend(self.y[train_signal_key])
 
+                    
+            
+            # 新增日志：检查每个片段的窗口数量
+            for i, key in enumerate(train_fold_keys):
+                window_count = len(X_train[i]) if self.manage_sequences else 0
+                logger.info(f"Segment {key} has {window_count} windows")
+            logger.info(f"Total X_train length (segments): {len(X_train)}")  # 应等于42
+            logger.info(f"Total windows across all segments: {sum(len(seg) for seg in X_train)}")  # 关键：总窗口数是否为1
+                    
+                    
+                    
+                    
+                    
+                    
             if self.data_augmentation:
                 from augly.audio import functional
                 # Compute classes distribution.
@@ -214,6 +254,9 @@ class Experiment:
                 X_train.extend(X_augmented)
                 y_train.extend(y_augmented)
                 logger.info(len(X_train))
+                
+                # 原有的标签编码器代码
+                self.target_encoder = LabelEncoder()
 
             # Create label encoder and fit with unique values.
             self.target_encoder = LabelEncoder()
@@ -237,6 +280,12 @@ class Experiment:
                             self.audio_sampling_frequency,
                             self.movement_sampling_frequency,
                             self.use_raw_data)
+            
+            
+            print("X_train 长度（样本数）：", len(X_train))
+            print("第一个样本形状：", len(X_train[0]) if X_train else None)
+            
+            
             funnel.fit(X_train, y_train_enc)
 
             if self.quantization:

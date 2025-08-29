@@ -37,10 +37,10 @@ def get_files_in_dataset(dataset):
         ext = "wav"
 
     dataset_files = []
-    labels_file_list = sorted(glob.glob(os.path.join(dataset.folder, "*labels.txt")))
+    labels_file_list = sorted(glob.glob(os.path.join(dataset.folder, "recording_*.txt")))
 
     for label_file in labels_file_list:
-        audio_file = label_file.replace('_labels.txt', '.' + ext)
+        audio_file = label_file.replace('.txt', '.' + ext)
 
         files_group = [audio_file]
         if dataset.multimodal:

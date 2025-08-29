@@ -32,18 +32,38 @@ class DeepSoundBaseRNN:
         self.feature_scaling = feature_scaling
 
     def fit(self, X, y):
+        
+        # # 新增：展平嵌套列表（若存在）
+        # if len(X) == 1 and isinstance(X[0], (list, np.ndarray)):
+        #     X = X[0]  # 从[ [sample1, ..., sample42] ] 变为 [sample1, ..., sample42]
+        
+        
+        
+        # 新增：打印原始X的长度和类型
+        print("Original X length:", len(X))
+        print("Original X[0] type:", type(X[0]))
+        print("Original X[0] length:", len(X[0]) if isinstance(X[0], (list, np.ndarray)) else "N/A")
+        
+        
         ''' Train network based on given data. '''
         self.classes_ = list(set(np.concatenate(y)))
         self.padding_class = len(self.classes_)
 
         X_pad = []
-
+        
+        
         for i in X:
             X_pad.append(
                 keras.preprocessing.sequence.pad_sequences(i,
                                                            padding='post',
                                                            value=-100.0,
                                                            dtype=float))
+            
+            
+        # 新增：打印原始X的长度和类型
+        print("Original X_pad[0] length:", len(X_pad[0]))
+            
+            
 
         y = keras.preprocessing.sequence.pad_sequences(
             y,
@@ -54,6 +74,15 @@ class DeepSoundBaseRNN:
         X = np.asarray(X_pad).astype('float32')
         y = np.asarray(y).astype('float32')
 
+        
+        
+        # 添加打印语句验证形状
+        print("X shape:", X.shape)
+        print("y shape:", y.shape)
+        
+        
+        
+        
         model_callbacks = [
             tf.keras.callbacks.EarlyStopping(patience=50)
         ]
@@ -63,12 +92,32 @@ class DeepSoundBaseRNN:
         if self.set_sample_weights:
             sample_weights = self._get_samples_weights(y)
 
+            
+            
+        # 新增！！！！        
+        X = np.squeeze(X, axis=0)  # 去掉第0维的1，恢复成(42, 835, 1800) 
+        print("X shape:", X.shape)
+        
+        
+        # 在 X = np.squeeze(...) 之后，模型训练前
+        print("X 数据统计：")
+        print(f"最小值: {np.min(X)}")
+        print(f"最大值: {np.max(X)}")
+        print(f"是否包含 nan: {np.isnan(X).any()}")
+        print(f"是否包含 inf: {np.isinf(X).any()}")
+
+        # 若存在异常值，进行处理（示例：替换为0或截断）
+        X = np.nan_to_num(X, nan=0.0, posinf=np.max(X[~np.isinf(X)]), neginf=np.min(X[~np.isinf(X)]))
+        
+        
+        
         self.model.fit(x=X,
                        y=y,
                        epochs=self.n_epochs,
                        verbose=1,
                        batch_size=self.batch_size,
                        validation_split=0.2,
+                       # validation_split=0,
                        shuffle=True,
                        sample_weight=sample_weights,
                        callbacks=model_callbacks)
@@ -159,7 +208,7 @@ class DeepSound(DeepSoundBaseRNN):
 
         # Model definition
         cnn = Sequential()
-        cnn.add(layers.Rescaling())
+        cnn.add(layers.Rescaling(scale=1.0))
 
         for ix_l, layer in enumerate(layers_config):
             for i in range(2):
