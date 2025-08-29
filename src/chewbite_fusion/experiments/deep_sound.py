@@ -15,11 +15,11 @@ logger = logging.getLogger('yaer')
 def get_model_instance(variable_params):
     return DeepSound(input_size=1800,
                      output_size=4,
-                     n_epochs=1500,
+                     n_epochs=1,
                      batch_size=10,
                      training_reshape=True,
                      set_sample_weights=True,
-                     feature_scaling=True)
+                     feature_scaling=False)
 
 
 @experiment()
@@ -35,6 +35,8 @@ def deep_sound():
                 # 以下句子是添加的invalidate_cache=True
                 # invalidate_cache=True
                )
+    
+    
     # 在此处添加日志，打印片段数量和示例编号
     logger.info("生成的片段数量: %s", len(X['zavalla2022'].keys()))
     logger.info("片段编号示例: %s", list(X['zavalla2022'].keys())[:5])
@@ -46,5 +48,4 @@ def deep_sound():
                    name='deep_sound',
                    manage_sequences=True,
                    use_raw_data=True)
-
     e.run()

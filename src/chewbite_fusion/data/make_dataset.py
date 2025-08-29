@@ -234,7 +234,9 @@ def main(data_source_names=['zavalla2022'],
             logger.info(f"Generated {len(audio_windows)} windows for {segment_name}")
             
             
-            
+            # 检查音频窗口
+            audio_has_nan = any(np.isnan(window).any() for window in audio_windows)
+            logger.info(f"Segment {segment_name} audio windows have NaN: {audio_has_nan}")
             
             
             imu_windows = []

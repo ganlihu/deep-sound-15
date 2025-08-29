@@ -286,6 +286,8 @@ class Experiment:
             print("第一个样本形状：", len(X_train[0]) if X_train else None)
             
             
+            # print("1111xxxX_train:", X_train.shape)  # 新增打印
+            
             funnel.fit(X_train, y_train_enc)
 
             if self.quantization:
@@ -300,6 +302,9 @@ class Experiment:
                     X_test = [self.X[test_signal_key]]
                 else:
                     X_test = self.X[test_signal_key]
+                    
+                    
+                # print("1111xxxX_test:", X_test.shape)  # 新增打印
 
                 y_signal_pred = funnel.predict(X_test)
 

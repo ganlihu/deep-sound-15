@@ -60,8 +60,8 @@ class DeepSoundBaseRNN:
                                                            dtype=float))
             
             
-        # 新增：打印原始X的长度和类型
-        print("Original X_pad[0] length:", len(X_pad[0]))
+        # 新增：打印原始X[0]的长度和类型
+        print("X_pad length:", len(X_pad))
             
             
 
@@ -74,6 +74,12 @@ class DeepSoundBaseRNN:
         X = np.asarray(X_pad).astype('float32')
         y = np.asarray(y).astype('float32')
 
+        
+        
+        # 在 deep_sound.py 的 fit 方法中，X = np.asarray(X_pad).astype('float32') 之后
+        print("After padding and converting to array:")
+        print(f"X has NaN: {np.isnan(X).any()}")
+        print(f"X has Inf: {np.isinf(X).any()}")
         
         
         # 添加打印语句验证形状
@@ -96,8 +102,16 @@ class DeepSoundBaseRNN:
             
         # 新增！！！！        
         X = np.squeeze(X, axis=0)  # 去掉第0维的1，恢复成(42, 835, 1800) 
+        print("X的内容：")
+        print(X)
         print("X shape:", X.shape)
         
+        
+        # 在 X = np.squeeze(X, axis=0) 之后
+        print("After squeezing:")
+        print(f"X has NaN: {np.isnan(X).any()}")
+        print(f"X has Inf: {np.isinf(X).any()}")
+
         
         # 在 X = np.squeeze(...) 之后，模型训练前
         print("X 数据统计：")
@@ -109,6 +123,13 @@ class DeepSoundBaseRNN:
         # 若存在异常值，进行处理（示例：替换为0或截断）
         X = np.nan_to_num(X, nan=0.0, posinf=np.max(X[~np.isinf(X)]), neginf=np.min(X[~np.isinf(X)]))
         
+        X = np.expand_dims(X, axis=-1)  # 补充通道维，形状变为(样本个数, seq_len, input_size, 1)
+        print("X测试 shape after 补充通道维度:", X.shape)  # 新增打印
+        
+        if self.feature_scaling:
+            X = (X + 1.0) * 100
+            print("缩放后 X训练 统计：", np.min(X), np.max(X))  # 关键检查
+
         
         
         self.model.fit(x=X,
@@ -132,11 +153,39 @@ class DeepSoundBaseRNN:
                                                            dtype=float))
 
         X = np.asarray(X_pad).astype('float32')
+        
+        # 在 deep_sound.py 的 predict 方法中，X = np.asarray(X_pad).astype('float32') 之后
+        print("Predict: After padding and converting to array:")
+        print(f"X has NaN: {np.isnan(X).any()}")
+        print(f"X has Inf: {np.isinf(X).any()}")
 
-        X = X[0]
+                  
+        print("X shape after padding:", X.shape)  # 新增打印  
+        
+
+        # X = X[0]
+        # 新增！！！！        
+        X = np.squeeze(X, axis=0)  # 去掉第0维的1，恢复成(42, 835, 1800) 
+        print("X shape after padding:", X.shape)  # 新增打印
+        print("X[的内容：")
+        print(X)
+        
+        # 在 X = X[0] 之后
+        print("Predict: After X = X[0]:")
+        print(f"X has NaN: {np.isnan(X).any()}")
+        print(f"X has Inf: {np.isinf(X).any()}")
+        
+        
+        
+        X = np.expand_dims(X, axis=-1)  # 补充通道维，形状变为(样本个数, seq_len, input_size, 1)
+        print("X测试 shape after 补充通道维度:", X.shape)  # 新增打印
+        
         if self.feature_scaling:
             X = (X + 1.0) * 100
+            print("缩放后 X测试 统计：", np.min(X), np.max(X))  # 关键检查
 
+                
+        
         y_pred = self.model.predict(X).argmax(axis=-1)
 
         return y_pred
